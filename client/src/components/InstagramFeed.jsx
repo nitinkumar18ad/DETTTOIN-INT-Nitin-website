@@ -124,18 +124,6 @@ export default function InstagramFeed() {
           </div>
         )}
 
-        {/* Action Button */}
-        <div className="text-center mt-12">
-          <a
-            href="https://www.instagram.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2.5 rounded-heritage bg-maroon-700 hover:bg-maroon-500 text-white font-semibold px-8 py-3 shadow-soft transition-all duration-200 cursor-pointer"
-          >
-            <InstagramLogo size={20} weight="bold" />
-            Follow @vasantvalleyschool
-          </a>
-        </div>
       </div>
     </SectionShell>
   );
