@@ -1,8 +1,6 @@
 # Vasant Valley School — Modern Web Application
-
 A modern, high-performance, and visually engaging web application for **Vasant Valley School**, built with React 18, Vite, Tailwind CSS, Framer Motion, GSAP, and Node.js / Express.
 
----
 
 ## 📌 Project & Candidate Information
 
@@ -16,7 +14,6 @@ A modern, high-performance, and visually engaging web application for **Vasant V
 ---
 
 ## 🛠️ Technologies Used
-
 - **Frontend**: React 18, Vite, Tailwind CSS, Framer Motion, GSAP (GreenSock), Phosphor Icons, Lenis Smooth Scroll
 - **Backend API**: Node.js, Express.js (REST API Endpoints)
 - **Deployment**: Vercel Ready (`vercel.json`)
@@ -24,7 +21,6 @@ A modern, high-performance, and visually engaging web application for **Vasant V
 ---
 
 ## 🚀 Key Improvements Made
-
 1. **Brand-Aligned Modern Aesthetic**:
    - Designed a rich, heritage-inspired color palette (`#3f0d0f` deep maroon, sandstone tints, warm ivory) paired with Cormorant Garamond serif and Source Sans typography.
 
@@ -91,7 +87,6 @@ A modern, high-performance, and visually engaging web application for **Vasant V
 ---
 
 ## 📁 Project Architecture
-
 ```
 ├── client/                     # Vite + React Frontend Application
 │   ├── src/
@@ -125,7 +120,6 @@ A modern, high-performance, and visually engaging web application for **Vasant V
 ---
 
 ## ⚙️ Production Build Verification
-
 To test the production bundle locally:
 
 ```bash
@@ -136,5 +130,4 @@ npm run build
 ---
 
 ## 📜 License
-
 Created for Vasant Valley School. All rights reserved.
