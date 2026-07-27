@@ -1,26 +1,54 @@
-# Vasant Valley School — Official Website Platform
+# Vasant Valley School — Modern Web Application
 
-A modern, high-performance, and visually engaging web application for **Vasant Valley School**, built with React, Vite, Tailwind CSS, Framer Motion, GSAP, and Node.js / Express.
-
----
-
-## 🌟 Key Features
-
-- **Hero & Motion Parallax**: Dynamic golden hour sports hero with scroll-driven depth parallax transitions.
-- **Interactive Ethos Radial Wheel (`ValueWheel.jsx`)**: 8-dimension 360° circular track with upright counter-rotating nodes, floating micro-physics, and real-time center showcase updates.
-- **Horizontal Deck News & Events Timeline (`NewsTimeline.jsx`)**: Compact date-milestone timeline deck with 1.8s auto-play progression, pause-on-hover, and horizontal crossfade.
-- **3D Curved Socials Carousel (`InstagramFeed.jsx`)**: Infinite 3D perspective stage showcasing live school activities.
-- **Custom Brand Design System (`CustomSelect.jsx`)**: Accessible glassmorphism custom dropdowns, modal focus traps, and keyboard navigation.
-- **Smooth Inertia Scrolling**: Powered by `@studio-freight/lenis` smooth scroll integrated with IntersectionObserver ScrollSpy.
-- **Full Responsiveness & Accessibility**: WCAG-compliant color contrasts, keyboard focus trapping (`ESC` closing), and reduced-motion fallbacks.
+A modern, high-performance, and visually engaging web application for **Vasant Valley School**, built with React 18, Vite, Tailwind CSS, Framer Motion, GSAP, and Node.js / Express.
 
 ---
 
-## 🛠️ Technology Stack
+## 📌 Project & Candidate Information
+
+- **Full Name**: Nitin Kumar
+- **Intern ID**: NA
+- **Email Address**: nitinumar18ad@gmail.com
+- **GitHub Username**: nitinkumar18ad
+- **Selected Website**: https://www.vasantvalley.org/
+- **Live Demo Link**: https://detttoin-int-nitin-website.vercel.app/
+
+---
+
+## 🛠️ Technologies Used
 
 - **Frontend**: React 18, Vite, Tailwind CSS, Framer Motion, GSAP (GreenSock), Phosphor Icons, Lenis Smooth Scroll
 - **Backend API**: Node.js, Express.js (REST API Endpoints)
 - **Deployment**: Vercel Ready (`vercel.json`)
+
+---
+
+## 🚀 Key Improvements Made
+
+1. **Brand-Aligned Modern Aesthetic**:
+   - Designed a rich, heritage-inspired color palette (`#3f0d0f` deep maroon, sandstone tints, warm ivory) paired with Cormorant Garamond serif and Source Sans typography.
+
+2. **Interactive 8-Dimension Ethos Radial Wheel (`ValueWheel.jsx`)**:
+   - Replaced static text lists with an interactive 360° circular wheel track featuring upright counter-rotating nodes, micro-physics animations, and dynamic central showcase cards.
+
+3. **50-50 Split Vision & Philosophy Page (`VisionPhilosophyPage.jsx`)**:
+   - Created a dedicated page featuring a sticky visual showcase card and an interactive Q&A accordion answering core educational principles.
+
+4. **Multi-Level Hover & Mobile Navigation (`Navbar.jsx`)**:
+   - Added hover dropdown menus for Core Values, About Us, News & Events, and Social Channels with official brand colors (`#1877F2` Facebook, `#0A66C2` LinkedIn, `#FF0000` YouTube, `#E4405F` Instagram).
+   - Built a non-intrusive React Portal side slide-over mobile drawer containing all navigation links, social channels, search, and portal login.
+
+5. **3D Perspective Card Tilt Animations (`MissionBlock.jsx`)**:
+   - Integrated cursor-driven 3D tilt physics and radial lighting sheen reflections with elevated 3D school logo badge displays.
+
+6. **Interactive News & Events Timeline (`NewsTimeline.jsx`)**:
+   - Implemented an automated 1.8s milestone deck progression with pause-on-hover controls and category filtering.
+
+7. **3D Curved Social Media Showcase (`InstagramFeed.jsx`)**:
+   - Created an infinite 3D perspective carousel showcasing live campus activities.
+
+8. **Inertia Smooth Scrolling & Accessibility**:
+   - Integrated `@studio-freight/lenis` smooth scroll with instant anchor target resolution and keyboard focus trapping for search and login modals.
 
 ---
 
@@ -68,22 +96,25 @@ A modern, high-performance, and visually engaging web application for **Vasant V
 ├── client/                     # Vite + React Frontend Application
 │   ├── src/
 │   │   ├── components/         # Reusable UI Components
+│   │   │   ├── AnnouncementPage.jsx# Dedicated Announcements Page
 │   │   │   ├── CustomSelect.jsx    # Custom Glassmorphism Dropdown
-│   │   │   ├── Footer.jsx          # Site Footer with Social Links
+│   │   │   ├── FaqPage.jsx         # Dedicated FAQ Page
+│   │   │   ├── Footer.jsx          # Site Footer with Official Social Links
 │   │   │   ├── InstagramFeed.jsx   # 3D Curved Social Carousel
 │   │   │   ├── LoginModal.jsx      # Student/Parent Login Modal
-│   │   │   ├── MainHero.jsx        # Parallax Hero Component
-│   │   │   ├── MissionBlock.jsx    # About Us Mission Card
-│   │   │   ├── Navbar.jsx          # Floating Pill Navigation
+│   │   │   ├── MainHero.jsx        # Hero Component
+│   │   │   ├── MissionBlock.jsx    # 3D Tilt About Us Mission Card
+│   │   │   ├── Navbar.jsx          # Floating Pill Navigation & Mobile Drawer
 │   │   │   ├── NewsTimeline.jsx    # Horizontal Timeline Deck
 │   │   │   ├── SearchOverlay.jsx   # Command-K Style Search Modal
 │   │   │   ├── SectionShell.jsx    # Layout Section Shell Wrapper
-│   │   │   ├── SplitFeature.jsx    # Parallax Feature Card Split
-│   │   │   └── ValueWheel.jsx      # 8-Node Core Ethos Radial Wheel
+│   │   │   ├── SplitFeature.jsx    # Feature Card Split
+│   │   │   ├── ValueWheel.jsx      # 8-Node Core Ethos Radial Wheel
+│   │   │   └── VisionPhilosophyPage.jsx # 50-50 Split Q&A Page
 │   │   ├── hooks/              # Custom React Hooks (ScrollSpy, FocusTrap)
 │   │   ├── utils/              # Utility Functions & Date Formatters
-│   │   ├── App.jsx             # Main Application Container
-│   │   └── index.css           # Global Tailwind CSS Styles
+│   │   ├── App.jsx             # Main Application Container & Router
+│   │   └── index.css           # Global Styles & Overflow Guards
 │   └── vite.config.js          # Vite Build Configuration
 └── server/                     # Node.js Express Backend API
     ├── data/                   # Initial Content Datasets
@@ -100,7 +131,6 @@ To test the production bundle locally:
 ```bash
 cd client
 npm run build
-npm run preview
 ```
 
 ---
