@@ -1,7 +1,17 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import SectionShell from "./SectionShell.jsx";
 import { formatDisplayDate } from "../utils/date.js";
 import { Funnel, ArrowClockwise, CalendarBlank, Newspaper } from "@phosphor-icons/react";
+
+const newsImagePool = [
+  "/images/hero/campus-morning.svg",
+  "/images/hero/sports-meet.svg",
+  "/images/hero/art-exhibition.svg",
+  "/images/hero/mainhero.png",
+  "/images/features/about.svg",
+  "/images/features/infrastructure.svg",
+  "/images/features/learning.svg",
+];
 
 export default function NewsTimeline({ newsEvents = [] }) {
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -18,6 +28,14 @@ export default function NewsTimeline({ newsEvents = [] }) {
     .sort((a, b) => b - a);
   const uniqueMonths = Array.from(new Set(newsEvents.map((item) => item.month)))
     .sort((a, b) => monthOrder[a] - monthOrder[b]);
+
+  const newsImagesById = useMemo(() => {
+    return newsEvents.reduce((accumulator, item, index) => {
+      const hashSeed = item.id.split("").reduce((sum, char) => sum + char.charCodeAt(0), index);
+      accumulator[item.id] = newsImagePool[hashSeed % newsImagePool.length];
+      return accumulator;
+    }, {});
+  }, [newsEvents]);
 
   // Filter events
   const filteredEvents = newsEvents.filter((item) => {
@@ -143,12 +161,16 @@ export default function NewsTimeline({ newsEvents = [] }) {
                   <div className="pl-12 lg:pl-0">
                     <article className="bg-white rounded-heritage border border-sandstone-200 p-6 shadow-soft hover:border-maroon-300 transition-all duration-300 flex flex-col gap-4">
                       {/* Image Preview */}
-                      <div className="relative h-40 overflow-hidden rounded bg-sandstone-100 flex items-center justify-center">
-                        <div className="absolute inset-0 bg-sandstone-950/5 flex items-center justify-center z-10 font-serif text-maroon-900 font-semibold text-sm">
-                          {item.title} Preview
-                        </div>
-                        <div className="w-full h-full bg-sandstone-200 flex items-center justify-center text-ink-500">
-                          {IsNews ? <Newspaper size={32} /> : <CalendarBlank size={32} />}
+                      <div className="relative h-40 overflow-hidden rounded bg-sandstone-100">
+                        <img
+                          src={newsImagesById[item.id]}
+                          alt={item.alt || item.title}
+                          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
+                        <div className="absolute bottom-3 left-3 rounded-full bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-maroon-900 shadow-sm">
+                          {IsNews ? "News" : "Event"}
                         </div>
                       </div>
 
