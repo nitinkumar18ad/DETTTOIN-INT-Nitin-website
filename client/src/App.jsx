@@ -11,6 +11,7 @@ import NewsTimeline from "./components/NewsTimeline.jsx";
 import InstagramFeed from "./components/InstagramFeed.jsx";
 import Footer from "./components/Footer.jsx";
 import FaqPage from "./components/FaqPage.jsx";
+import AnnouncementPage from "./components/AnnouncementPage.jsx";
 import useScrollSpy from "./hooks/useScrollSpy.js";
 
 const fallbackNavItems = [
@@ -157,7 +158,7 @@ const featuresData = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState("home"); // "home" | "faq"
+  const [currentPage, setCurrentPage] = useState("home"); // "home" | "faq" | "announcement"
   const [navItems, setNavItems] = useState(() => sanitizeNavItems(fallbackNavItems));
   const [values, setValues] = useState(fallbackValues);
   const [newsEvents, setNewsEvents] = useState(fallbackNewsEvents);
@@ -281,6 +282,8 @@ export default function App() {
 
       {currentPage === "faq" ? (
         <FaqPage onNavigateHome={() => handleNavigate("home")} />
+      ) : currentPage === "announcement" ? (
+        <AnnouncementPage onNavigateHome={() => handleNavigate("home")} />
       ) : (
         <main tabIndex="-1" className="min-h-dvh bg-sandstone-50 text-ink-900 focus:outline-none">
           <MainHero />

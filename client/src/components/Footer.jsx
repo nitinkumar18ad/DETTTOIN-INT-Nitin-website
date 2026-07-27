@@ -1,4 +1,4 @@
-import { FacebookLogo, InstagramLogo, EnvelopeSimple, MapPin, Phone, TwitterLogo } from "@phosphor-icons/react";
+import { FacebookLogo, InstagramLogo, LinkedinLogo, YoutubeLogo, EnvelopeSimple, Phone } from "@phosphor-icons/react";
 
 export default function Footer({ onLoginOpen }) {
   const currentYear = new Date().getFullYear();
@@ -16,7 +16,7 @@ export default function Footer({ onLoginOpen }) {
 
               <div className="mt-10 flex items-center gap-3">
                 <a
-                  href="https://www.instagram.com"
+                  href="https://www.instagram.com/vasantvalleyoffici"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 !text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/8 hover:!text-white"
@@ -25,7 +25,7 @@ export default function Footer({ onLoginOpen }) {
                   <InstagramLogo size={18} weight="regular" className="!text-white" />
                 </a>
                 <a
-                  href="https://www.facebook.com"
+                  href="https://www.facebook.com/Vasantvalleyschoolofficial/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 !text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/8 hover:!text-white"
@@ -34,18 +34,22 @@ export default function Footer({ onLoginOpen }) {
                   <FacebookLogo size={18} weight="regular" className="!text-white" />
                 </a>
                 <a
-                  href={`mailto:info@vasantvalley.org`}
+                  href="https://www.linkedin.com/school/vasant-valley-school/?originalSubdomain=in"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 !text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/8 hover:!text-white"
-                  aria-label="Send email"
+                  aria-label="Visit LinkedIn"
                 >
-                  <EnvelopeSimple size={18} weight="regular" className="!text-white" />
+                  <LinkedinLogo size={18} weight="regular" className="!text-white" />
                 </a>
                 <a
-                  href="tel:+911126896542"
+                  href="https://www.youtube.com/channel/UCRXNIQzX175MX9hMVRWjmaA"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 !text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/8 hover:!text-white"
-                  aria-label="Call school"
+                  aria-label="Visit YouTube"
                 >
-                  <Phone size={18} weight="regular" className="!text-white" />
+                  <YoutubeLogo size={18} weight="regular" className="!text-white" />
                 </a>
               </div>
             </div>

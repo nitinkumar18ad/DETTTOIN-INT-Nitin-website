@@ -7,7 +7,12 @@ import {
   Question,
   Compass,
   CaretDown,
-  BookOpen
+  Megaphone,
+  NewspaperClipping,
+  InstagramLogo,
+  FacebookLogo,
+  LinkedinLogo,
+  YoutubeLogo
 } from "@phosphor-icons/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useFocusTrap from "../hooks/useFocusTrap.js";
@@ -17,6 +22,29 @@ import useScrollSpy from "../hooks/useScrollSpy.js";
 const BASE_COLOR = "#3f0d0f";
 const HOVER_TEXT = "#ffffff";
 const EASE = "power3.out";
+
+const SOCIAL_LINKS = [
+  {
+    name: "Instagram",
+    href: "https://www.instagram.com/vasantvalleyoffici",
+    icon: InstagramLogo
+  },
+  {
+    name: "Facebook",
+    href: "https://www.facebook.com/Vasantvalleyschoolofficial/",
+    icon: FacebookLogo
+  },
+  {
+    name: "LinkedIn",
+    href: "https://www.linkedin.com/school/vasant-valley-school/?originalSubdomain=in",
+    icon: LinkedinLogo
+  },
+  {
+    name: "YouTube",
+    href: "https://www.youtube.com/channel/UCRXNIQzX175MX9hMVRWjmaA",
+    icon: YoutubeLogo
+  }
+];
 
 /* ─── Helpers ──────────────────────────────────────────────────────────── */
 function flattenNav(navItems) {
@@ -221,7 +249,12 @@ export default function Navbar({
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAboutHovered, setIsAboutHovered] = useState(false);
-  const hoverTimerRef = useRef(null);
+  const [isNewsHovered, setIsNewsHovered] = useState(false);
+  const [isSocialsHovered, setIsSocialsHovered] = useState(false);
+
+  const hoverAboutTimerRef = useRef(null);
+  const hoverNewsTimerRef = useRef(null);
+  const hoverSocialsTimerRef = useRef(null);
 
   const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
   const drawerRef = useFocusTrap(isDrawerOpen, closeDrawer);
@@ -262,13 +295,35 @@ export default function Navbar({
   }, [navItems.length]);
 
   const handleAboutMouseEnter = () => {
-    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    if (hoverAboutTimerRef.current) clearTimeout(hoverAboutTimerRef.current);
     setIsAboutHovered(true);
   };
 
   const handleAboutMouseLeave = () => {
-    hoverTimerRef.current = setTimeout(() => {
+    hoverAboutTimerRef.current = setTimeout(() => {
       setIsAboutHovered(false);
+    }, 180);
+  };
+
+  const handleNewsMouseEnter = () => {
+    if (hoverNewsTimerRef.current) clearTimeout(hoverNewsTimerRef.current);
+    setIsNewsHovered(true);
+  };
+
+  const handleNewsMouseLeave = () => {
+    hoverNewsTimerRef.current = setTimeout(() => {
+      setIsNewsHovered(false);
+    }, 180);
+  };
+
+  const handleSocialsMouseEnter = () => {
+    if (hoverSocialsTimerRef.current) clearTimeout(hoverSocialsTimerRef.current);
+    setIsSocialsHovered(true);
+  };
+
+  const handleSocialsMouseLeave = () => {
+    hoverSocialsTimerRef.current = setTimeout(() => {
+      setIsSocialsHovered(false);
     }, 180);
   };
 
@@ -276,6 +331,12 @@ export default function Navbar({
     e.preventDefault();
     setIsAboutHovered(false);
     if (onNavigate) onNavigate("faq");
+  };
+
+  const handleAnnouncementClick = (e) => {
+    e.preventDefault();
+    setIsNewsHovered(false);
+    if (onNavigate) onNavigate("announcement");
   };
 
   const handleHomeClick = (e, href) => {
@@ -328,6 +389,8 @@ export default function Navbar({
             {navItems.map((item) => {
               const sectionId = item.href?.startsWith("#") ? item.href.slice(1) : item.id;
               const isAbout = item.id === "about";
+              const isNews = item.id === "news-events";
+              const isSocials = item.id === "instagram-feed";
               const isActive = currentPage === "home" && activeSection === sectionId;
 
               if (isAbout) {
@@ -368,6 +431,92 @@ export default function Navbar({
                           <Question size={16} weight="bold" className="text-maroon-700 shrink-0" />
                           <span>FAQ Section</span>
                         </a>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              if (isNews) {
+                return (
+                  <div
+                    key={item.id}
+                    className="relative flex items-center"
+                    onMouseEnter={handleNewsMouseEnter}
+                    onMouseLeave={handleNewsMouseLeave}
+                  >
+                    <NavPill
+                      item={item}
+                      isActive={isActive}
+                      hasDropdown={true}
+                      onClick={(e) => handleHomeClick(e, item.href)}
+                    />
+
+                    {/* Minimal News & Events Hover Dropdown Menu */}
+                    {isNewsHovered && (
+                      <div className="absolute top-full left-0 mt-2 w-52 rounded-2xl bg-white/95 backdrop-blur-xl border border-sandstone-200/90 shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                        <a
+                          href="#news-events"
+                          onClick={(e) => {
+                            setIsNewsHovered(false);
+                            handleHomeClick(e, "#news-events");
+                          }}
+                          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline"
+                        >
+                          <NewspaperClipping size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                          <span>Timeline & Events</span>
+                        </a>
+
+                        <a
+                          href="#announcements"
+                          onClick={handleAnnouncementClick}
+                          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline"
+                        >
+                          <Megaphone size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                          <span>Announcements</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              if (isSocials) {
+                return (
+                  <div
+                    key={item.id}
+                    className="relative flex items-center"
+                    onMouseEnter={handleSocialsMouseEnter}
+                    onMouseLeave={handleSocialsMouseLeave}
+                  >
+                    <NavPill
+                      item={item}
+                      isActive={isActive}
+                      hasDropdown={true}
+                      onClick={(e) => handleHomeClick(e, item.href)}
+                    />
+
+                    {/* Minimal Socials Hover Dropdown Menu */}
+                    {isSocialsHovered && (
+                      <div className="absolute top-full right-0 mt-2 w-48 rounded-2xl bg-white/95 backdrop-blur-xl border border-sandstone-200/90 shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                        {SOCIAL_LINKS.map((soc) => {
+                          const Icon = soc.icon;
+                          return (
+                            <a
+                              key={soc.name}
+                              href={soc.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setIsSocialsHovered(false)}
+                              className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline"
+                            >
+                              <span className="flex items-center gap-2.5">
+                                <Icon size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                                <span>{soc.name}</span>
+                              </span>
+                            </a>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -464,6 +613,7 @@ export default function Navbar({
                     </a>
                   </li>
                 ))}
+                
                 {/* Mobile FAQ Link */}
                 <li className="pt-2 border-t border-sandstone-200">
                   <a
@@ -478,8 +628,48 @@ export default function Navbar({
                       <Question size={18} weight="bold" />
                       <span>FAQ Page</span>
                     </span>
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-maroon-900 text-white">NEW</span>
                   </a>
+                </li>
+
+                {/* Mobile Announcement Link */}
+                <li>
+                  <a
+                    href="#announcements"
+                    onClick={(e) => {
+                      closeDrawer();
+                      handleAnnouncementClick(e);
+                    }}
+                    className="flex items-center justify-between rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-maroon-900 bg-maroon-50 hover:bg-maroon-100 no-underline"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Megaphone size={18} weight="bold" />
+                      <span>Announcements</span>
+                    </span>
+                  </a>
+                </li>
+
+                {/* Mobile Social Channels */}
+                <li className="pt-3 border-t border-sandstone-200">
+                  <span className="px-4 text-[10px] font-extrabold uppercase tracking-widest text-maroon-800 block mb-2">
+                    Official Social Channels
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 px-2">
+                    {SOCIAL_LINKS.map((soc) => {
+                      const Icon = soc.icon;
+                      return (
+                        <a
+                          key={soc.name}
+                          href={soc.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-sandstone-200 text-xs font-bold text-maroon-950 hover:bg-maroon-50 no-underline"
+                        >
+                          <Icon size={16} weight="bold" className="text-maroon-700" />
+                          <span>{soc.name}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
                 </li>
               </ul>
             </nav>
