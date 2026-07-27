@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { InstagramLogo, Heart, ChatCircle, CaretLeft, CaretRight, Sparkle } from "@phosphor-icons/react";
+import { InstagramLogo, Heart, ChatCircle, CaretLeft, CaretRight, Star } from "@phosphor-icons/react";
 import SectionShell from "./SectionShell.jsx";
 
 const mockInstagramPosts = [
@@ -197,7 +197,7 @@ export default function InstagramFeed() {
                         {post.comments}
                       </span>
                     </div>
-                    <Sparkle size={14} className="text-amber-300" weight="fill" />
+                    <Star size={14} className="text-amber-300" weight="fill" />
                   </div>
                 </div>
 

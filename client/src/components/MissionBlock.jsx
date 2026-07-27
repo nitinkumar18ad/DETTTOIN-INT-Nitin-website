@@ -2,7 +2,7 @@ import SectionShell from "./SectionShell.jsx";
 
 export default function MissionBlock() {
   return (
-    <SectionShell id="about" className="bg-white">
+    <SectionShell className="bg-white">
       <div className="rounded-heritage border border-sandstone-200 bg-sandstone-100 p-6 shadow-soft sm:p-10 lg:p-12">
         <div className="max-w-4xl">
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-maroon-700">

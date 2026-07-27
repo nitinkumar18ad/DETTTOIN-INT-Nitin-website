@@ -21,7 +21,7 @@ export const values = [
     id: "spiritual",
     label: "Spiritual",
     description: "Inner steadiness, reflection, and a sense of purpose.",
-    icon: "sparkle"
+    icon: "compass"
   },
   {
     id: "emotional",

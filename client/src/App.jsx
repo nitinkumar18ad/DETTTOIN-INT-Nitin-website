@@ -15,6 +15,7 @@ import useScrollSpy from "./hooks/useScrollSpy.js";
 const fallbackNavItems = [
   { id: "main-content", label: "Home", href: "#main-content", children: [] },
   { id: "about", label: "About Us", href: "#about", children: [] },
+  { id: "values", label: "Core Values", href: "#values", children: [] },
   { id: "news-events", label: "News & Events", href: "#news-events", children: [] },
   { id: "instagram-feed", label: "Socials", href: "#instagram-feed", children: [] }
 ];
@@ -64,7 +65,7 @@ const fallbackValues = [
   { id: "cerebral", label: "Cerebral", description: "Curiosity, reflection, and disciplined thought.", icon: "brain" },
   { id: "social", label: "Social", description: "Respectful participation in class, house, and community life.", icon: "users" },
   { id: "physical", label: "Physical", description: "Health, movement, resilience, and confidence through sport.", icon: "heartbeat" },
-  { id: "spiritual", label: "Spiritual", description: "Inner steadiness, reflection, and a sense of purpose.", icon: "sparkle" },
+  { id: "spiritual", label: "Spiritual", description: "Inner steadiness, reflection, and a sense of purpose.", icon: "compass" },
   { id: "emotional", label: "Emotional", description: "Self-awareness, empathy, and thoughtful relationships.", icon: "heart" },
   { id: "environmental", label: "Environmental", description: "Care for nature and responsibility toward shared resources.", icon: "leaf" },
   { id: "creative", label: "Creative", description: "Expression through art, performance, writing, and design.", icon: "palette" },
@@ -315,22 +316,24 @@ export default function App() {
       <Navbar navItems={navItems} onSearchOpen={openSearch} onLoginOpen={openLogin} activeSection={activeSection} />
       <main tabIndex="-1" className="min-h-dvh bg-sandstone-50 text-ink-900 focus:outline-none">
         <MainHero />
-        <MissionBlock />
-        {featuresData.map((feature) => (
-          <SplitFeature
-            key={feature.id}
-            id={feature.id}
-            category={feature.category}
-            heading={feature.heading}
-            body={feature.body}
-            linkText={feature.linkText}
-            linkHref={feature.linkHref}
-            image={feature.image}
-            alt={feature.alt}
-            isReversed={feature.isReversed}
-            bgColor={feature.bgColor}
-          />
-        ))}
+        {/* Unified About Us section spanning from MissionBlock through all SplitFeatures until Core Values */}
+        <div id="about" className="scroll-mt-20">
+          <MissionBlock />
+          {featuresData.map((feature) => (
+            <SplitFeature
+              key={feature.id}
+              category={feature.category}
+              heading={feature.heading}
+              body={feature.body}
+              linkText={feature.linkText}
+              linkHref={feature.linkHref}
+              image={feature.image}
+              alt={feature.alt}
+              isReversed={feature.isReversed}
+              bgColor={feature.bgColor}
+            />
+          ))}
+        </div>
         <ValueWheel values={values} />
         <NewsTimeline newsEvents={newsEvents} />
         <InstagramFeed />

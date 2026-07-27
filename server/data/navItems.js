@@ -12,6 +12,12 @@ export const navItems = [
     children: []
   },
   {
+    id: "values",
+    label: "Core Values",
+    href: "#values",
+    children: []
+  },
+  {
     id: "announcements",
     label: "Announcements",
     href: "#announcements",

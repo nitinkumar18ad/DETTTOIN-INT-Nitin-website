@@ -11,7 +11,7 @@
  * All other a11y (focus trap, Escape close, aria roles) is preserved as-is.
  */
 import { gsap } from "gsap";
-import { List, MagnifyingGlass, SignIn, X } from "@phosphor-icons/react";
+import { List, MagnifyingGlass, User, X } from "@phosphor-icons/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useFocusTrap from "../hooks/useFocusTrap.js";
 import useScrollSpy from "../hooks/useScrollSpy.js";
@@ -341,10 +341,11 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
           <button
             type="button"
             onClick={onLoginOpen}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-heritage text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500"
-            aria-label="Open login"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-maroon-900 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-maroon-800 hover:shadow-lg active:scale-95 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 focus-visible:ring-offset-2 cursor-pointer"
+            aria-label="Open login modal"
           >
-            <SignIn size={22} weight="bold" />
+            <User size={16} weight="bold" />
+            <span className="whitespace-nowrap">Login</span>
           </button>
 
           <button

@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SectionShell from "./SectionShell.jsx";
 import { formatDisplayDate } from "../utils/date.js";
-import { CalendarBlank, ArrowRight, CaretLeft, CaretRight, Sparkle } from "@phosphor-icons/react";
+import { CalendarBlank, ArrowRight, CaretLeft, CaretRight, NewspaperClipping, Tag } from "@phosphor-icons/react";
 
 import CustomSelect from "./CustomSelect.jsx";
 
@@ -100,7 +100,7 @@ export default function NewsTimeline({ newsEvents = [] }) {
         >
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-maroon-50 border border-maroon-100 text-maroon-700 text-xs font-semibold uppercase tracking-wider mb-3">
-              <Sparkle size={14} weight="fill" />
+              <NewspaperClipping size={14} weight="bold" />
               <span>Campus Milestones</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-serif font-bold text-maroon-900">News &amp; Events</h2>
@@ -272,7 +272,7 @@ export default function NewsTimeline({ newsEvents = [] }) {
                             <div className="mt-5 flex flex-wrap items-center gap-2">
                               {sortedEvents[activeIdx].highlights.map((tag) => (
                                 <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sandstone-100 border border-sandstone-200/90 text-maroon-950 text-xs font-semibold shadow-xs">
-                                  <Sparkle size={12} className="text-maroon-700" weight="fill" />
+                                  <Tag size={12} className="text-maroon-700" weight="bold" />
                                   {tag}
                                 </span>
                               ))}

@@ -1,17 +1,18 @@
 import { AnimatePresence, animate, motion, useInView, useMotionTemplate, useMotionValue, useTransform } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SectionShell from "./SectionShell.jsx";
-import { Brain, Users, Heartbeat, Sparkle, Heart, Leaf, Palette, Scales } from "@phosphor-icons/react";
+import { Brain, Users, Heartbeat, Compass, Heart, Leaf, Palette, Scales } from "@phosphor-icons/react";
 
 const iconMap = {
   brain: Brain,
   users: Users,
   heartbeat: Heartbeat,
-  sparkle: Sparkle,
+  spiritual: Compass,
+  compass: Compass,
   heart: Heart,
   leaf: Leaf,
   palette: Palette,
-  scales: Scales
+  scales: Scales,
 };
 
 function useMediaQuery(query) {
@@ -43,7 +44,7 @@ function ValueNode({
   onHoverStart,
   onHoverEnd,
 }) {
-  const Icon = iconMap[value.icon] || Sparkle;
+  const Icon = iconMap[value.icon] || Compass;
   const floatY = useMotionValue(0);
   const hoverLift = useMotionValue(0);
   const nodeScale = useMotionValue(1);
@@ -424,7 +425,7 @@ export default function ValueWheel({ values = [] }) {
       {/* Mobile/Tablet Grid Layout (below lg) */}
       <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
         {values.map((value) => {
-          const Icon = iconMap[value.icon] || Sparkle;
+          const Icon = iconMap[value.icon] || Compass;
           const currentIndex = values.findIndex((item) => item.id === value.id);
           const isActive = activeIndex === currentIndex;
 
