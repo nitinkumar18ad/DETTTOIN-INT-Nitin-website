@@ -92,28 +92,28 @@ function ValueNode({
 
   const shadowAnimation = isActive
     ? {
-        boxShadow: [
-          "0 10px 20px rgba(69, 24, 20, 0.14)",
-          "0 16px 32px rgba(69, 24, 20, 0.24)",
-          "0 10px 20px rgba(69, 24, 20, 0.14)",
-        ],
-      }
+      boxShadow: [
+        "0 10px 20px rgba(69, 24, 20, 0.14)",
+        "0 16px 32px rgba(69, 24, 20, 0.24)",
+        "0 10px 20px rgba(69, 24, 20, 0.14)",
+      ],
+    }
     : {
-        boxShadow: isHovering
-          ? "0 16px 30px rgba(69, 24, 20, 0.16)"
-          : "0 8px 16px rgba(69, 24, 20, 0.08)",
-      };
+      boxShadow: isHovering
+        ? "0 16px 30px rgba(69, 24, 20, 0.16)"
+        : "0 8px 16px rgba(69, 24, 20, 0.08)",
+    };
 
   const shadowTransition = isActive
     ? {
-        duration: 2,
-        ease: "easeInOut",
-        repeat: Infinity,
-      }
+      duration: 2,
+      ease: "easeInOut",
+      repeat: Infinity,
+    }
     : {
-        duration: 0.3,
-        ease: "easeOut",
-      };
+      duration: 0.3,
+      ease: "easeOut",
+    };
 
   return (
     <motion.button
@@ -122,11 +122,10 @@ function ValueNode({
       onMouseLeave={onHoverEnd}
       onFocus={onActivate}
       onClick={onActivate}
-      className={`absolute pointer-events-auto flex flex-col items-center justify-center w-20 h-20 rounded-full border bg-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-maroon-500 shadow-sm cursor-pointer transform-gpu will-change-transform ${
-        isActive
-          ? "border-maroon-700 bg-maroon-50 text-maroon-900"
-          : "border-sandstone-200 hover:border-maroon-500 text-ink-700"
-      }`}
+      className={`absolute pointer-events-auto flex flex-col items-center justify-center w-20 h-20 rounded-full border bg-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-maroon-500 shadow-sm cursor-pointer transform-gpu will-change-transform ${isActive
+        ? "border-maroon-700 bg-maroon-50 text-maroon-900"
+        : "border-sandstone-200 hover:border-maroon-500 text-ink-700"
+        }`}
       style={{
         opacity: nodeOpacity,
         transform,
@@ -435,11 +434,10 @@ export default function ValueWheel({ values = [] }) {
               type="button"
               onClick={() => setActiveIndex(isActive ? null : currentIndex)}
               onFocus={() => setActiveIndex(currentIndex)}
-              className={`w-full text-left p-5 rounded-heritage border transition-all duration-300 bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-700 cursor-pointer ${
-                isActive
-                  ? "border-maroon-700 shadow-soft bg-maroon-50/20"
-                  : "border-sandstone-200 hover:border-maroon-200"
-              }`}
+              className={`w-full text-left p-5 rounded-heritage border transition-all duration-300 bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-700 cursor-pointer ${isActive
+                ? "border-maroon-700 shadow-soft bg-maroon-50/20"
+                : "border-sandstone-200 hover:border-maroon-200"
+                }`}
               initial={false}
               whileTap={{ scale: 0.99 }}
               aria-expanded={isActive}

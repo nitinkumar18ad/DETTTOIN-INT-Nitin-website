@@ -74,7 +74,7 @@ export default function Footer({ onLoginOpen }) {
                       Student Portal
                     </button>
                   </li>
-                  <li><a href="#footer" className="!text-white/75 transition-colors hover:!text-white">Contact</a></li>
+                  <li><a href="#instagram-feed" className="!text-white/75 transition-colors hover:!text-white">Socials</a></li>
                   <li><a href="#" className="!text-white/75 transition-colors hover:!text-white">Admissions</a></li>
                 </ul>
               </div>

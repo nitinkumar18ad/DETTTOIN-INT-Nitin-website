@@ -6,6 +6,7 @@ const HERO_ALT =
 export default function MainHero() {
   return (
     <section
+      id="main-content"
       aria-label="Vasant Valley School welcome"
       className="relative w-full overflow-hidden bg-sandstone-50"
     >

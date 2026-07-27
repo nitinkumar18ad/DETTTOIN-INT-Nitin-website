@@ -24,9 +24,9 @@ export const navItems = [
     children: []
   },
   {
-    id: "contact",
-    label: "Contact",
-    href: "#footer",
+    id: "instagram-feed",
+    label: "Socials",
+    href: "#instagram-feed",
     children: []
   }
 ];

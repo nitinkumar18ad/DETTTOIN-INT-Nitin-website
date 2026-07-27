@@ -53,7 +53,12 @@ function NavPill({ item, isActive }) {
   const tlRef = useRef(null);
   const activeTweenRef = useRef(null);
 
-  // Build / rebuild hover timeline when active state or item changes
+  const isActiveRef = useRef(isActive);
+  useEffect(() => {
+    isActiveRef.current = isActive;
+  }, [isActive]);
+
+  // Build hover timeline once when item.id changes
   useEffect(() => {
     const circle = circleRef.current;
     const pill = pillRef.current;
@@ -82,11 +87,11 @@ function NavPill({ item, isActive }) {
       xPercent: -50,
       scale: 0,
       transformOrigin: `50% ${originY}px`,
-      display: isActive ? "none" : "block",
+      display: "block",
     });
 
     if (label) gsap.set(label, { y: 0 });
-    if (hoverLabel) gsap.set(hoverLabel, { y: h + 12, opacity: 0 });
+    if (hoverLabel) gsap.set(hoverLabel, { y: Math.ceil(h + 20), opacity: 0 });
 
     tlRef.current?.kill();
     const tl = gsap.timeline({ paused: true });
@@ -109,7 +114,6 @@ function NavPill({ item, isActive }) {
     }
 
     if (hoverLabel) {
-      gsap.set(hoverLabel, { y: Math.ceil(h + 20), opacity: 0 });
       tl.to(hoverLabel, {
         y: 0,
         opacity: 1,
@@ -118,16 +122,40 @@ function NavPill({ item, isActive }) {
         overwrite: "auto",
       }, 0);
     }
-
     tlRef.current = tl;
 
+    if (isActiveRef.current) {
+      tl.progress(1);
+    }
+
     return () => {
-      tlRef.current?.kill();
+      tl.kill();
     };
-  }, [isActive, item.id]);
+  }, [item.id]);
+
+  // Trigger animation when active state changes from scroll spy
+  useEffect(() => {
+    const tl = tlRef.current;
+    if (!tl) return;
+    activeTweenRef.current?.kill();
+
+    if (isActive) {
+      activeTweenRef.current = tl.tweenTo(tl.duration(), {
+        duration: 0.35,
+        ease: EASE,
+        overwrite: "auto",
+      });
+    } else {
+      activeTweenRef.current = tl.tweenTo(0, {
+        duration: 0.25,
+        ease: EASE,
+        overwrite: "auto",
+      });
+    }
+  }, [isActive]);
 
   const handleEnter = useCallback(() => {
-    if (isActive) return; // No hover animation on active pill
+    if (isActive) return;
     const tl = tlRef.current;
     if (!tl) return;
     activeTweenRef.current?.kill();
@@ -148,7 +176,7 @@ function NavPill({ item, isActive }) {
       ease: EASE,
       overwrite: "auto",
     });
-  }, [isActive]);
+  }, []);
 
   return (
     <li role="none" className="flex items-center">
@@ -162,11 +190,7 @@ function NavPill({ item, isActive }) {
         onMouseLeave={handleLeave}
         onFocus={handleEnter}
         onBlur={handleLeave}
-        className={`pill-nav-link relative inline-flex h-10 self-center items-center justify-center overflow-hidden rounded-full px-5 text-sm font-semibold uppercase tracking-wider no-underline select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-maroon-900 ${
-          isActive
-            ? "bg-white text-maroon-900 hover:bg-white hover:text-maroon-900"
-            : "bg-white text-ink-900 hover:bg-white hover:text-ink-900"
-        }`}
+        className={`pill-nav-link relative inline-flex h-10 self-center items-center justify-center overflow-hidden rounded-full px-5 text-sm font-semibold uppercase tracking-wider no-underline select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-maroon-900 bg-white hover:bg-white ${isActive ? "text-maroon-900" : "text-ink-900"}`}
       >
         {/* Rising background circle - always rendered, hidden via GSAP when active */}
         <span
@@ -390,8 +414,8 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
                   href={item.href}
                   onClick={closeDrawer}
                   className={`rounded-heritage border px-4 py-3 font-semibold no-underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 ${activeSection === item.id
-                      ? "border-maroon-300 bg-maroon-50 text-maroon-900"
-                      : "border-sandstone-200 bg-white text-ink-900 hover:border-maroon-100 hover:bg-maroon-50 hover:text-maroon-700"
+                    ? "border-maroon-300 bg-maroon-50 text-maroon-900"
+                    : "border-sandstone-200 bg-white text-ink-900 hover:border-maroon-100 hover:bg-maroon-50 hover:text-maroon-700"
                     }`}
                   aria-current={activeSection === item.id ? "page" : undefined}
                 >

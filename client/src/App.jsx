@@ -16,7 +16,7 @@ const fallbackNavItems = [
   { id: "main-content", label: "Home", href: "#main-content", children: [] },
   { id: "about", label: "About Us", href: "#about", children: [] },
   { id: "news-events", label: "News & Events", href: "#news-events", children: [] },
-  { id: "footer", label: "Contact", href: "#footer", children: [] }
+  { id: "instagram-feed", label: "Socials", href: "#instagram-feed", children: [] }
 ];
 
 function sanitizeNavItems(items) {
@@ -75,72 +75,78 @@ const fallbackNewsEvents = [
   {
     id: "founders-day",
     type: "event",
-    title: "Founder's Day",
+    title: "Founder's Day Celebration",
     date: "2026-04-18",
     month: "April",
     year: 2026,
     category: "School Events",
-    summary: "The school community gathers to mark an important day in its calendar.",
+    summary: "The school community gathers to mark Founder's Day with ceremonial speeches, alumni honors, and symphonic performances celebrating Vasant Valley's founding heritage.",
+    highlights: ["Alumni Honors", "Symphonic Band", "Heritage Address"],
     image: "/images/news/founders-day.jpg",
     href: "#"
   },
   {
     id: "science-week",
     type: "news",
-    title: "Science Week",
+    title: "Annual Science & Tech Fair",
     date: "2026-03-12",
     month: "March",
     year: 2026,
     category: "Academics",
-    summary: "Students present experiments, research displays, and classroom explorations.",
+    summary: "Students present hands-on experiments, robotics prototypes, and environmental research displays. Interactive workshops featured live science demonstrations led by senior scholars.",
+    highlights: ["120+ Projects", "Robotics Expo", "Green Tech"],
     image: "/images/news/science-week.jpg",
     href: "#"
   },
   {
     id: "junior-school-assembly",
     type: "event",
-    title: "Junior School Assembly",
+    title: "Junior School Grand Assembly",
     date: "2026-02-20",
     month: "February",
     year: 2026,
     category: "Assemblies",
-    summary: "The junior school shares music, readings, and class presentations.",
+    summary: "The junior school shares music, choral readings, and creative class drama presentations celebrating empathy, community responsibility, and teamwork.",
+    highlights: ["Choral Ensemble", "Class Drama", "Student Badges"],
     image: "/images/news/junior-assembly.jpg",
     href: "#"
   },
   {
     id: "sports-day",
     type: "event",
-    title: "Sports Day",
+    title: "Annual Athletics & Sports Meet",
     date: "2026-01-28",
     month: "January",
     year: 2026,
     category: "Sports",
-    summary: "Track, field, and team events bring students together across houses.",
+    summary: "Track, field, and inter-house athletics bring the entire school together on the sports ground. Students compete for house glory with determination and sportsmanship.",
+    highlights: ["Inter-House Cup", "Sprint Finals", "March Past"],
     image: "/images/news/sports-day.jpg",
     href: "#"
   },
   {
     id: "library-week",
     type: "news",
-    title: "Library Week",
+    title: "Literary & Book Week",
     date: "2025-11-16",
     month: "November",
     year: 2025,
     category: "Learning",
-    summary: "Reading circles, author sessions, and book displays animate the library.",
+    summary: "Reading circles, guest author interactive sessions, and rare book displays animate the school library. Students participate in creative writing challenges.",
+    highlights: ["Author Q&A", "Book Showcase", "Writing Award"],
     image: "/images/news/library-week.jpg",
     href: "#"
   },
   {
     id: "environment-drive",
     type: "news",
-    title: "Environment Drive",
+    title: "Campus Sustainability Drive",
     date: "2025-09-05",
     month: "September",
     year: 2025,
     category: "Environment",
-    summary: "Students lead campus initiatives around waste, water, and care for green spaces.",
+    summary: "Students lead campus-wide sustainability initiatives focusing on rainwater harvesting, zero-waste composting, and solar energy awareness across all wings.",
+    highlights: ["Tree Plantation", "Solar Audit", "Zero-Waste"],
     image: "/images/news/environment-drive.jpg",
     href: "#"
   }
@@ -307,7 +313,7 @@ export default function App() {
         Skip to main content
       </a>
       <Navbar navItems={navItems} onSearchOpen={openSearch} onLoginOpen={openLogin} activeSection={activeSection} />
-      <main id="main-content" tabIndex="-1" className="min-h-dvh bg-sandstone-50 text-ink-900 focus:outline-none">
+      <main tabIndex="-1" className="min-h-dvh bg-sandstone-50 text-ink-900 focus:outline-none">
         <MainHero />
         <MissionBlock />
         {featuresData.map((feature) => (
