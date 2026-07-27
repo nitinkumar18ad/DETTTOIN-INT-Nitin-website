@@ -16,15 +16,6 @@ export default function Footer({ onLoginOpen }) {
 
               <div className="mt-10 flex items-center gap-3">
                 <a
-                  href="https://www.instagram.com/vasantvalleyoffici"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 !text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/8 hover:!text-white"
-                  aria-label="Visit Instagram"
-                >
-                  <InstagramLogo size={18} weight="regular" className="!text-white" />
-                </a>
-                <a
                   href="https://www.facebook.com/Vasantvalleyschoolofficial/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -50,6 +41,15 @@ export default function Footer({ onLoginOpen }) {
                   aria-label="Visit YouTube"
                 >
                   <YoutubeLogo size={18} weight="regular" className="!text-white" />
+                </a>
+                <a
+                  href="https://www.instagram.com/vasantvalleyoffici"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 !text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/8 hover:!text-white"
+                  aria-label="Visit Instagram"
+                >
+                  <InstagramLogo size={18} weight="regular" className="!text-white" />
                 </a>
               </div>
             </div>

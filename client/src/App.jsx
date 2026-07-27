@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import LoginModal from "./components/LoginModal.jsx";
 import Navbar from "./components/Navbar.jsx";
@@ -12,6 +12,7 @@ import InstagramFeed from "./components/InstagramFeed.jsx";
 import Footer from "./components/Footer.jsx";
 import FaqPage from "./components/FaqPage.jsx";
 import AnnouncementPage from "./components/AnnouncementPage.jsx";
+import VisionPhilosophyPage from "./components/VisionPhilosophyPage.jsx";
 import useScrollSpy from "./hooks/useScrollSpy.js";
 
 const fallbackNavItems = [
@@ -158,12 +159,13 @@ const featuresData = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState("home"); // "home" | "faq" | "announcement"
+  const [currentPage, setCurrentPage] = useState("home"); // "home" | "faq" | "announcement" | "vision"
   const [navItems, setNavItems] = useState(() => sanitizeNavItems(fallbackNavItems));
   const [values, setValues] = useState(fallbackValues);
   const [newsEvents, setNewsEvents] = useState(fallbackNewsEvents);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const lenisRef = useRef(null);
 
   const sectionIds = [
     "main-content",
@@ -189,6 +191,7 @@ export default function App() {
       touchMultiplier: 2,
     });
 
+    lenisRef.current = lenis;
     let animationFrameId;
 
     function raf(time) {
@@ -200,10 +203,10 @@ export default function App() {
 
     const handleAnchorClick = (e) => {
       const href = e.currentTarget.getAttribute("href");
-      if (href?.startsWith("#")) {
-        e.preventDefault();
+      if (href?.startsWith("#") && href.length > 1) {
         const target = document.querySelector(href);
         if (target) {
+          e.preventDefault();
           lenis.scrollTo(target);
         }
       }
@@ -214,6 +217,7 @@ export default function App() {
 
     return () => {
       lenis.destroy();
+      lenisRef.current = null;
       cancelAnimationFrame(animationFrameId);
       anchorLinks.forEach((link) => link.removeEventListener("click", handleAnchorClick));
     };
@@ -259,7 +263,10 @@ export default function App() {
 
   const handleNavigate = useCallback((page) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    }
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
 
   return (
@@ -284,12 +291,14 @@ export default function App() {
         <FaqPage onNavigateHome={() => handleNavigate("home")} />
       ) : currentPage === "announcement" ? (
         <AnnouncementPage onNavigateHome={() => handleNavigate("home")} />
+      ) : currentPage === "vision" ? (
+        <VisionPhilosophyPage onNavigateHome={() => handleNavigate("home")} />
       ) : (
         <main tabIndex="-1" className="min-h-dvh bg-sandstone-50 text-ink-900 focus:outline-none">
           <MainHero />
           {/* Unified About Us section spanning from MissionBlock through all SplitFeatures until Core Values */}
           <div id="about" className="scroll-mt-20">
-            <MissionBlock />
+            <MissionBlock onNavigateVision={() => handleNavigate("vision")} />
             {featuresData.map((feature) => (
               <SplitFeature
                 key={feature.id}

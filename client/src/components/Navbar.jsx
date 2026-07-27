@@ -12,7 +12,10 @@ import {
   InstagramLogo,
   FacebookLogo,
   LinkedinLogo,
-  YoutubeLogo
+  YoutubeLogo,
+  ArrowUpRight,
+  Lightbulb,
+  Scales
 } from "@phosphor-icons/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useFocusTrap from "../hooks/useFocusTrap.js";
@@ -25,24 +28,28 @@ const EASE = "power3.out";
 
 const SOCIAL_LINKS = [
   {
-    name: "Instagram",
-    href: "https://www.instagram.com/vasantvalleyoffici",
-    icon: InstagramLogo
-  },
-  {
     name: "Facebook",
     href: "https://www.facebook.com/Vasantvalleyschoolofficial/",
-    icon: FacebookLogo
+    icon: FacebookLogo,
+    colorClass: "text-[#1877F2]"
   },
   {
     name: "LinkedIn",
     href: "https://www.linkedin.com/school/vasant-valley-school/?originalSubdomain=in",
-    icon: LinkedinLogo
+    icon: LinkedinLogo,
+    colorClass: "text-[#0A66C2]"
   },
   {
     name: "YouTube",
     href: "https://www.youtube.com/channel/UCRXNIQzX175MX9hMVRWjmaA",
-    icon: YoutubeLogo
+    icon: YoutubeLogo,
+    colorClass: "text-[#FF0000]"
+  },
+  {
+    name: "Instagram",
+    href: "https://www.instagram.com/vasantvalleyoffici",
+    icon: InstagramLogo,
+    colorClass: "text-[#E4405F]"
   }
 ];
 
@@ -249,10 +256,12 @@ export default function Navbar({
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAboutHovered, setIsAboutHovered] = useState(false);
+  const [isValuesHovered, setIsValuesHovered] = useState(false);
   const [isNewsHovered, setIsNewsHovered] = useState(false);
   const [isSocialsHovered, setIsSocialsHovered] = useState(false);
 
   const hoverAboutTimerRef = useRef(null);
+  const hoverValuesTimerRef = useRef(null);
   const hoverNewsTimerRef = useRef(null);
   const hoverSocialsTimerRef = useRef(null);
 
@@ -305,6 +314,17 @@ export default function Navbar({
     }, 180);
   };
 
+  const handleValuesMouseEnter = () => {
+    if (hoverValuesTimerRef.current) clearTimeout(hoverValuesTimerRef.current);
+    setIsValuesHovered(true);
+  };
+
+  const handleValuesMouseLeave = () => {
+    hoverValuesTimerRef.current = setTimeout(() => {
+      setIsValuesHovered(false);
+    }, 180);
+  };
+
   const handleNewsMouseEnter = () => {
     if (hoverNewsTimerRef.current) clearTimeout(hoverNewsTimerRef.current);
     setIsNewsHovered(true);
@@ -328,20 +348,38 @@ export default function Navbar({
   };
 
   const handleFaqClick = (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setIsAboutHovered(false);
     if (onNavigate) onNavigate("faq");
   };
 
   const handleAnnouncementClick = (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setIsNewsHovered(false);
     if (onNavigate) onNavigate("announcement");
+  };
+
+  const handleVisionClick = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setIsValuesHovered(false);
+    setIsAboutHovered(false);
+    if (onNavigate) onNavigate("vision");
   };
 
   const handleHomeClick = (e, href) => {
     if (onNavigate) onNavigate("home");
   };
+
+  const dropdownItemClasses = "flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 font-sans hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline cursor-pointer select-none";
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/30 bg-white/40 backdrop-blur-lg shadow-sm">
@@ -389,6 +427,7 @@ export default function Navbar({
             {navItems.map((item) => {
               const sectionId = item.href?.startsWith("#") ? item.href.slice(1) : item.id;
               const isAbout = item.id === "about";
+              const isValues = item.id === "values";
               const isNews = item.id === "news-events";
               const isSocials = item.id === "instagram-feed";
               const isActive = currentPage === "home" && activeSection === sectionId;
@@ -417,7 +456,7 @@ export default function Navbar({
                             setIsAboutHovered(false);
                             handleHomeClick(e, "#about");
                           }}
-                          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline"
+                          className={dropdownItemClasses}
                         >
                           <Compass size={16} weight="bold" className="text-maroon-700 shrink-0" />
                           <span>Overview</span>
@@ -426,10 +465,56 @@ export default function Navbar({
                         <a
                           href="#faq"
                           onClick={handleFaqClick}
-                          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline"
+                          onPointerDown={handleFaqClick}
+                          className={dropdownItemClasses}
                         >
                           <Question size={16} weight="bold" className="text-maroon-700 shrink-0" />
                           <span>FAQ Section</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              if (isValues) {
+                return (
+                  <div
+                    key={item.id}
+                    className="relative flex items-center"
+                    onMouseEnter={handleValuesMouseEnter}
+                    onMouseLeave={handleValuesMouseLeave}
+                  >
+                    <NavPill
+                      item={item}
+                      isActive={isActive}
+                      hasDropdown={true}
+                      onClick={(e) => handleHomeClick(e, item.href)}
+                    />
+
+                    {/* Minimal Core Values Hover Dropdown Menu */}
+                    {isValuesHovered && (
+                      <div className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-white/95 backdrop-blur-xl border border-sandstone-200/90 shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                        <a
+                          href="#values"
+                          onClick={(e) => {
+                            setIsValuesHovered(false);
+                            handleHomeClick(e, "#values");
+                          }}
+                          className={dropdownItemClasses}
+                        >
+                          <Scales size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                          <span>8 Canonical Ethos</span>
+                        </a>
+
+                        <a
+                          href="#vision-philosophy"
+                          onClick={handleVisionClick}
+                          onPointerDown={handleVisionClick}
+                          className={dropdownItemClasses}
+                        >
+                          <Lightbulb size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                          <span>Vision & Philosophy</span>
                         </a>
                       </div>
                     )}
@@ -461,7 +546,7 @@ export default function Navbar({
                             setIsNewsHovered(false);
                             handleHomeClick(e, "#news-events");
                           }}
-                          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline"
+                          className={dropdownItemClasses}
                         >
                           <NewspaperClipping size={16} weight="bold" className="text-maroon-700 shrink-0" />
                           <span>Timeline & Events</span>
@@ -470,7 +555,8 @@ export default function Navbar({
                         <a
                           href="#announcements"
                           onClick={handleAnnouncementClick}
-                          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline"
+                          onPointerDown={handleAnnouncementClick}
+                          className={dropdownItemClasses}
                         >
                           <Megaphone size={16} weight="bold" className="text-maroon-700 shrink-0" />
                           <span>Announcements</span>
@@ -498,7 +584,7 @@ export default function Navbar({
 
                     {/* Minimal Socials Hover Dropdown Menu */}
                     {isSocialsHovered && (
-                      <div className="absolute top-full right-0 mt-2 w-48 rounded-2xl bg-white/95 backdrop-blur-xl border border-sandstone-200/90 shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                      <div className="absolute top-full right-0 mt-2 w-52 rounded-2xl bg-white/95 backdrop-blur-xl border border-sandstone-200/90 shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                         {SOCIAL_LINKS.map((soc) => {
                           const Icon = soc.icon;
                           return (
@@ -508,12 +594,13 @@ export default function Navbar({
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={() => setIsSocialsHovered(false)}
-                              className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline"
+                              className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 font-sans hover:bg-maroon-50 transition-colors group no-underline select-none cursor-pointer"
                             >
                               <span className="flex items-center gap-2.5">
-                                <Icon size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                                <Icon size={18} weight="fill" className={`${soc.colorClass} shrink-0`} />
                                 <span>{soc.name}</span>
                               </span>
+                              <ArrowUpRight size={14} weight="bold" className="text-ink-400 group-hover:text-maroon-900 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />
                             </a>
                           );
                         })}
@@ -614,15 +701,32 @@ export default function Navbar({
                   </li>
                 ))}
                 
-                {/* Mobile FAQ Link */}
+                {/* Mobile Vision & Philosophy Link */}
                 <li className="pt-2 border-t border-sandstone-200">
+                  <a
+                    href="#vision-philosophy"
+                    onClick={(e) => {
+                      closeDrawer();
+                      handleVisionClick(e);
+                    }}
+                    className="flex items-center justify-between rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-maroon-900 bg-maroon-50 hover:bg-maroon-100 no-underline cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Lightbulb size={18} weight="bold" />
+                      <span>Vision & Philosophy</span>
+                    </span>
+                  </a>
+                </li>
+
+                {/* Mobile FAQ Link */}
+                <li>
                   <a
                     href="#faq"
                     onClick={(e) => {
                       closeDrawer();
                       handleFaqClick(e);
                     }}
-                    className="flex items-center justify-between rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-maroon-900 bg-maroon-50 hover:bg-maroon-100 no-underline"
+                    className="flex items-center justify-between rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-maroon-900 bg-maroon-50 hover:bg-maroon-100 no-underline cursor-pointer"
                   >
                     <span className="flex items-center gap-2">
                       <Question size={18} weight="bold" />
@@ -639,7 +743,7 @@ export default function Navbar({
                       closeDrawer();
                       handleAnnouncementClick(e);
                     }}
-                    className="flex items-center justify-between rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-maroon-900 bg-maroon-50 hover:bg-maroon-100 no-underline"
+                    className="flex items-center justify-between rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-maroon-900 bg-maroon-50 hover:bg-maroon-100 no-underline cursor-pointer"
                   >
                     <span className="flex items-center gap-2">
                       <Megaphone size={18} weight="bold" />
@@ -664,7 +768,7 @@ export default function Navbar({
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-sandstone-200 text-xs font-bold text-maroon-950 hover:bg-maroon-50 no-underline"
                         >
-                          <Icon size={16} weight="bold" className="text-maroon-700" />
+                          <Icon size={18} weight="fill" className={soc.colorClass} />
                           <span>{soc.name}</span>
                         </a>
                       );
