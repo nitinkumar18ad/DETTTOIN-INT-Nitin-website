@@ -21,45 +21,8 @@ const fallbackNavItems = [
 ];
 
 function sanitizeNavItems(items) {
-  return (items?.length ? items : fallbackNavItems).filter(
-    (item) =>
-      item.id !== "school-life" &&
-      item.label !== "School Life" &&
-      item.id !== "announcements" &&
-      item.label !== "Announcements"
-  );
+  return items?.length ? items : fallbackNavItems;
 }
-
-const fallbackHeroSlides = [
-  {
-    id: "sports-champions",
-    title: "Sports Day Champions",
-    caption: "Students from every house gather on the open grounds — competing, celebrating, and carrying the school's spirit of excellence in deed.",
-    date: "2026-01-28",
-    category: "Sports",
-    image: "/images/hero/mainhero.png",
-    alt: "Vasant Valley School students assembled on the sports ground at golden hour",
-    fullBleed: true
-  },
-  {
-    id: "campus-morning",
-    title: "Morning On Campus",
-    caption: "The sandstone buildings and open grounds frame everyday school life.",
-    date: "2026-03-04",
-    category: "Campus",
-    image: "/images/hero/campus-morning.svg",
-    alt: "Vasant Valley School campus in morning light"
-  },
-  {
-    id: "art-exhibition",
-    title: "Student Art Exhibition",
-    caption: "Creative work from classrooms and studios is shared with families.",
-    date: "2025-11-22",
-    category: "Creative",
-    image: "/images/hero/art-exhibition.svg",
-    alt: "Student artwork displayed for a school exhibition"
-  }
-];
 
 const fallbackValues = [
   { id: "cerebral", label: "Cerebral", description: "Curiosity, reflection, and disciplined thought.", icon: "brain" },
@@ -155,7 +118,7 @@ const fallbackNewsEvents = [
 
 const featuresData = [
   {
-    id: "about",
+    id: "about-overview",
     category: "About Us",
     heading: "A Legacy of Intellectual Depth and Character",
     body: "Vasant Valley School was established to provide a space where learning is an interactive and immersive process. Our pedagogy encourages students to be independent thinkers, ethical leaders, and empathetic members of society.",
@@ -194,19 +157,14 @@ const featuresData = [
 
 export default function App() {
   const [navItems, setNavItems] = useState(() => sanitizeNavItems(fallbackNavItems));
-  const [heroSlides, setHeroSlides] = useState(fallbackHeroSlides);
   const [values, setValues] = useState(fallbackValues);
   const [newsEvents, setNewsEvents] = useState(fallbackNewsEvents);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const sectionIds = [
     "main-content",
     "about",
-    "infrastructure",
-    "learning",
     "values",
     "news-events",
     "instagram-feed",
@@ -218,7 +176,7 @@ export default function App() {
 
   useEffect(() => {
     // Respect prefers-reduced-motion
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (mediaQuery.matches) return;
 
     const lenis = new Lenis({
@@ -240,8 +198,8 @@ export default function App() {
 
     // Provide Lenis to anchor links for smooth scrolling to sections
     const handleAnchorClick = (e) => {
-      const href = e.currentTarget.getAttribute('href');
-      if (href?.startsWith('#')) {
+      const href = e.currentTarget.getAttribute("href");
+      if (href?.startsWith("#")) {
         e.preventDefault();
         const target = document.querySelector(href);
         if (target) {
@@ -251,12 +209,12 @@ export default function App() {
     };
 
     const anchorLinks = document.querySelectorAll('a[href^="#"]');
-    anchorLinks.forEach(link => link.addEventListener('click', handleAnchorClick));
+    anchorLinks.forEach((link) => link.addEventListener("click", handleAnchorClick));
 
     return () => {
       lenis.destroy();
       cancelAnimationFrame(animationFrameId);
-      anchorLinks.forEach(link => link.removeEventListener('click', handleAnchorClick));
+      anchorLinks.forEach((link) => link.removeEventListener("click", handleAnchorClick));
     };
   }, []);
 
@@ -265,9 +223,6 @@ export default function App() {
 
     async function loadHomeContent() {
       try {
-        setIsLoading(true);
-        setError(null);
-        // Use a relative URL so this works on both localhost and Vercel (via vite proxy / same origin)
         const apiBase = import.meta.env.VITE_API_URL ?? "";
         const response = await fetch(`${apiBase}/api/home`);
         if (!response.ok) {
@@ -277,18 +232,14 @@ export default function App() {
         const data = await response.json();
         if (isMounted) {
           setNavItems(sanitizeNavItems(data.navItems));
-          setHeroSlides(data.heroSlides || fallbackHeroSlides);
           setValues(data.values || fallbackValues);
           setNewsEvents(data.newsEvents || fallbackNewsEvents);
-          setIsLoading(false);
         }
       } catch {
         if (isMounted) {
           setNavItems(sanitizeNavItems(fallbackNavItems));
-          setHeroSlides(fallbackHeroSlides);
           setValues(fallbackValues);
           setNewsEvents(fallbackNewsEvents);
-          setIsLoading(false);
         }
       }
     }
