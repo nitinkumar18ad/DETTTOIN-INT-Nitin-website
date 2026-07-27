@@ -15,9 +15,11 @@ import {
   YoutubeLogo,
   ArrowUpRight,
   Lightbulb,
-  Scales
+  Scales,
+  House
 } from "@phosphor-icons/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import useFocusTrap from "../hooks/useFocusTrap.js";
 import useScrollSpy from "../hooks/useScrollSpy.js";
 
@@ -52,11 +54,6 @@ const SOCIAL_LINKS = [
     colorClass: "text-[#E4405F]"
   }
 ];
-
-/* ─── Helpers ──────────────────────────────────────────────────────────── */
-function flattenNav(navItems) {
-  return navItems.flatMap((item) => [item, ...(item.children || [])]);
-}
 
 function computeCircleGeometry(w, h) {
   const R = ((w * w) / 4 + h * h) / (2 * h);
@@ -267,7 +264,6 @@ export default function Navbar({
 
   const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
   const drawerRef = useFocusTrap(isDrawerOpen, closeDrawer);
-  const allLinks = flattenNav(navItems);
 
   const sectionIds = navItems.map((item) => item.href?.replace("#", "")).filter(Boolean);
   const activeSectionSpy = useScrollSpy({ sectionIds });
@@ -353,6 +349,7 @@ export default function Navbar({
       e.stopPropagation();
     }
     setIsAboutHovered(false);
+    closeDrawer();
     if (onNavigate) onNavigate("faq");
   };
 
@@ -362,6 +359,7 @@ export default function Navbar({
       e.stopPropagation();
     }
     setIsNewsHovered(false);
+    closeDrawer();
     if (onNavigate) onNavigate("announcement");
   };
 
@@ -372,41 +370,43 @@ export default function Navbar({
     }
     setIsValuesHovered(false);
     setIsAboutHovered(false);
+    closeDrawer();
     if (onNavigate) onNavigate("vision");
   };
 
   const handleHomeClick = (e, href) => {
+    closeDrawer();
     if (onNavigate) onNavigate("home");
   };
 
   const dropdownItemClasses = "flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 font-sans hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline cursor-pointer select-none";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/30 bg-white/40 backdrop-blur-lg shadow-sm">
+    <header className="sticky top-0 z-40 border-b border-white/30 bg-white/50 backdrop-blur-lg shadow-sm w-full">
       <nav
         aria-label="Primary navigation"
-        className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
+        className="mx-auto flex min-h-16 sm:min-h-20 max-w-7xl items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8 w-full"
       >
         {/* ── Logo ──────────────────────────────────────────────────── */}
         <a
           href="#main-content"
           onClick={(e) => handleHomeClick(e, "#main-content")}
-          className="flex flex-shrink-0 items-center gap-3 no-underline cursor-pointer"
+          className="flex flex-shrink items-center gap-2 sm:gap-3 no-underline cursor-pointer min-w-0"
           aria-label="Vasant Valley School — home"
         >
           <img
             src="/logo.svg"
             alt=""
-            className="h-12 w-auto max-w-[72px] shrink-0 object-contain object-left sm:h-14 sm:max-w-[80px]"
+            className="h-10 sm:h-14 w-auto max-w-[56px] sm:max-w-[80px] shrink-0 object-contain object-left"
             width={80}
             height={56}
             decoding="async"
           />
-          <span className="flex flex-col leading-tight">
-            <span className="font-serif text-xl font-bold text-maroon-900 sm:text-2xl">
+          <span className="flex flex-col leading-tight min-w-0">
+            <span className="font-serif text-base sm:text-2xl font-bold text-maroon-900 truncate">
               Vasant Valley
             </span>
-            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700 sm:text-sm">
+            <span className="text-[9px] sm:text-sm font-semibold uppercase tracking-[0.14em] text-ink-700 truncate">
               School
             </span>
           </span>
@@ -504,7 +504,7 @@ export default function Navbar({
                           className={dropdownItemClasses}
                         >
                           <Scales size={16} weight="bold" className="text-maroon-700 shrink-0" />
-                          <span>8 Canonical Ethos</span>
+                          <span>Core Values</span>
                         </a>
 
                         <a
@@ -623,141 +623,192 @@ export default function Navbar({
         </div>
 
         {/* ── Action Buttons (Search, Login, Hamburger) ────────────── */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             type="button"
             onClick={onSearchOpen}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-heritage text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 cursor-pointer"
+            className="inline-flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-heritage text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 cursor-pointer"
             aria-label="Open search"
           >
-            <MagnifyingGlass size={22} weight="bold" />
+            <MagnifyingGlass size={20} weight="bold" />
           </button>
 
           <button
             type="button"
             onClick={onLoginOpen}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-maroon-900 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-maroon-800 hover:shadow-lg active:scale-95 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 focus-visible:ring-offset-2 cursor-pointer"
+            className="inline-flex h-9 sm:h-10 items-center justify-center gap-1.5 rounded-full bg-maroon-900 px-3 sm:px-4 py-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-maroon-800 active:scale-95 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 cursor-pointer"
             aria-label="Open login modal"
           >
-            <User size={16} weight="bold" />
-            <span className="whitespace-nowrap">Login</span>
+            <User size={15} weight="bold" />
+            <span className="hidden sm:inline whitespace-nowrap">Login</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-heritage text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 lg:hidden cursor-pointer"
+            className="inline-flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-heritage text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 lg:hidden cursor-pointer"
             aria-label="Open menu"
             aria-expanded={isDrawerOpen}
           >
-            <List size={24} weight="bold" />
+            <List size={22} weight="bold" />
           </button>
         </div>
 
       </nav>
 
-      {/* ── Mobile Drawer Menu ────────────────────────────────────── */}
-      {isDrawerOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
-            onClick={closeDrawer}
-            aria-hidden="true"
-          />
+      {/* ── React Portal Side Slide-Over Mobile Drawer Menu ─────────────── */}
+      {isDrawerOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[999] lg:hidden">
+            
+            {/* Semi-transparent Backdrop Overlay */}
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300"
+              onClick={closeDrawer}
+              aria-hidden="true"
+            />
 
-          <div
-            ref={drawerRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation Menu"
-            className="fixed inset-y-0 right-0 flex w-full max-w-sm flex-col bg-sandstone-50 p-6 shadow-2xl transition-transform"
-          >
-            <div className="flex items-center justify-between border-b border-sandstone-200 pb-4">
-              <span className="font-serif text-lg font-bold text-maroon-900">Menu</span>
-              <button
-                type="button"
-                onClick={closeDrawer}
-                className="rounded-heritage p-2 text-ink-700 hover:bg-sandstone-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 cursor-pointer"
-                aria-label="Close menu"
-              >
-                <X size={24} weight="bold" />
-              </button>
-            </div>
+            {/* Right Side Panel (80vw width / max 300px) */}
+            <div
+              ref={drawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation Menu"
+              className="fixed inset-y-0 right-0 z-[1000] flex w-[80vw] max-w-[300px] flex-col bg-sandstone-50 shadow-2xl transition-transform duration-300 ease-out overflow-y-auto"
+            >
+              {/* Header */}
+              <div className="sticky top-0 z-20 flex items-center justify-between border-b border-sandstone-200 bg-sandstone-50/95 backdrop-blur-md px-4 py-3.5 shrink-0">
+                <span className="font-serif text-lg font-bold text-maroon-950 flex items-center gap-2">
+                  <img src="/logo.svg" alt="" className="h-6 w-auto" />
+                  <span>Menu</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={closeDrawer}
+                  className="rounded-full p-1.5 text-ink-800 hover:bg-sandstone-200 focus-visible:outline-none cursor-pointer"
+                  aria-label="Close menu"
+                >
+                  <X size={22} weight="bold" />
+                </button>
+              </div>
 
-            <nav aria-label="Mobile navigation" className="mt-6 flex-1 overflow-y-auto">
-              <ul className="flex flex-col gap-2">
-                {allLinks.map((item) => (
-                  <li key={item.id}>
-                    <a
-                      href={item.href}
-                      onClick={(e) => {
-                        closeDrawer();
-                        handleHomeClick(e, item.href);
-                      }}
-                      className="block rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-ink-900 hover:bg-maroon-50 hover:text-maroon-700 no-underline"
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
+              {/* All Options Listed Vertically Below Menu */}
+              <div className="p-4 space-y-4 flex-1 w-full">
                 
-                {/* Mobile Vision & Philosophy Link */}
-                <li className="pt-2 border-t border-sandstone-200">
+                {/* 1. Home */}
+                <div>
                   <a
-                    href="#vision-philosophy"
-                    onClick={(e) => {
-                      closeDrawer();
-                      handleVisionClick(e);
-                    }}
-                    className="flex items-center justify-between rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-maroon-900 bg-maroon-50 hover:bg-maroon-100 no-underline cursor-pointer"
+                    href="#main-content"
+                    onClick={(e) => handleHomeClick(e, "#main-content")}
+                    className="flex items-center gap-3 rounded-2xl bg-white px-3.5 py-3 font-bold text-xs uppercase tracking-wider text-maroon-950 border border-sandstone-200 shadow-xs no-underline"
                   >
-                    <span className="flex items-center gap-2">
-                      <Lightbulb size={18} weight="bold" />
-                      <span>Vision & Philosophy</span>
-                    </span>
+                    <House size={18} weight="bold" className="text-maroon-700" />
+                    <span>Home Page</span>
                   </a>
-                </li>
+                </div>
 
-                {/* Mobile FAQ Link */}
-                <li>
-                  <a
-                    href="#faq"
-                    onClick={(e) => {
-                      closeDrawer();
-                      handleFaqClick(e);
-                    }}
-                    className="flex items-center justify-between rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-maroon-900 bg-maroon-50 hover:bg-maroon-100 no-underline cursor-pointer"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Question size={18} weight="bold" />
-                      <span>FAQ Page</span>
-                    </span>
-                  </a>
-                </li>
-
-                {/* Mobile Announcement Link */}
-                <li>
-                  <a
-                    href="#announcements"
-                    onClick={(e) => {
-                      closeDrawer();
-                      handleAnnouncementClick(e);
-                    }}
-                    className="flex items-center justify-between rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-maroon-900 bg-maroon-50 hover:bg-maroon-100 no-underline cursor-pointer"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Megaphone size={18} weight="bold" />
-                      <span>Announcements</span>
-                    </span>
-                  </a>
-                </li>
-
-                {/* Mobile Social Channels */}
-                <li className="pt-3 border-t border-sandstone-200">
-                  <span className="px-4 text-[10px] font-extrabold uppercase tracking-widest text-maroon-800 block mb-2">
-                    Official Social Channels
+                {/* 2. About Us Section */}
+                <div className="space-y-1">
+                  <span className="px-2 text-[10px] font-extrabold uppercase tracking-widest text-maroon-800 block">
+                    About Us & Foundation
                   </span>
-                  <div className="grid grid-cols-2 gap-2 px-2">
+                  <div className="bg-white rounded-2xl border border-sandstone-200 overflow-hidden divide-y divide-sandstone-100">
+                    <a
+                      href="#about"
+                      onClick={(e) => handleHomeClick(e, "#about")}
+                      className="flex items-center justify-between px-3.5 py-2.5 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 no-underline"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Compass size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                        <span>Overview & Campus</span>
+                      </span>
+                      <ArrowUpRight size={13} weight="bold" className="text-ink-400" />
+                    </a>
+
+                    <a
+                      href="#faq"
+                      onClick={handleFaqClick}
+                      className="flex items-center justify-between px-3.5 py-2.5 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 no-underline cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Question size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                        <span>FAQ Section</span>
+                      </span>
+                      <ArrowUpRight size={13} weight="bold" className="text-ink-400" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* 3. Core Values Section */}
+                <div className="space-y-1">
+                  <span className="px-2 text-[10px] font-extrabold uppercase tracking-widest text-maroon-800 block">
+                    Ethos & Philosophy
+                  </span>
+                  <div className="bg-white rounded-2xl border border-sandstone-200 overflow-hidden divide-y divide-sandstone-100">
+                    <a
+                      href="#values"
+                      onClick={(e) => handleHomeClick(e, "#values")}
+                      className="flex items-center justify-between px-3.5 py-2.5 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 no-underline"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Scales size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                        <span>Core Values</span>
+                      </span>
+                      <ArrowUpRight size={13} weight="bold" className="text-ink-400" />
+                    </a>
+
+                    <a
+                      href="#vision-philosophy"
+                      onClick={handleVisionClick}
+                      className="flex items-center justify-between px-3.5 py-2.5 text-xs font-bold uppercase tracking-wider text-maroon-950 bg-maroon-50/70 hover:bg-maroon-100/70 no-underline cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Lightbulb size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                        <span>Vision & Philosophy</span>
+                      </span>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-maroon-900 text-white">NEW</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* 4. News & Events Section */}
+                <div className="space-y-1">
+                  <span className="px-2 text-[10px] font-extrabold uppercase tracking-widest text-maroon-800 block">
+                    Updates & Life
+                  </span>
+                  <div className="bg-white rounded-2xl border border-sandstone-200 overflow-hidden divide-y divide-sandstone-100">
+                    <a
+                      href="#news-events"
+                      onClick={(e) => handleHomeClick(e, "#news-events")}
+                      className="flex items-center justify-between px-3.5 py-2.5 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 no-underline"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <NewspaperClipping size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                        <span>Timeline & Events</span>
+                      </span>
+                      <ArrowUpRight size={13} weight="bold" className="text-ink-400" />
+                    </a>
+
+                    <a
+                      href="#announcements"
+                      onClick={handleAnnouncementClick}
+                      className="flex items-center justify-between px-3.5 py-2.5 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 no-underline cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Megaphone size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                        <span>Announcements</span>
+                      </span>
+                      <ArrowUpRight size={13} weight="bold" className="text-ink-400" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* 5. Official Social Channels */}
+                <div className="space-y-1 pt-1">
+                  <span className="px-2 text-[10px] font-extrabold uppercase tracking-widest text-maroon-800 block">
+                    Social Media Links
+                  </span>
+                  <div className="grid grid-cols-2 gap-2">
                     {SOCIAL_LINKS.map((soc) => {
                       const Icon = soc.icon;
                       return (
@@ -766,20 +817,51 @@ export default function Navbar({
                           href={soc.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-sandstone-200 text-xs font-bold text-maroon-950 hover:bg-maroon-50 no-underline"
+                          className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-sandstone-200 text-[11px] font-bold text-maroon-950 hover:bg-maroon-50 no-underline shadow-xs"
                         >
-                          <Icon size={18} weight="fill" className={soc.colorClass} />
-                          <span>{soc.name}</span>
+                          <span className="flex items-center gap-2">
+                            <Icon size={16} weight="fill" className={soc.colorClass} />
+                            <span>{soc.name}</span>
+                          </span>
+                          <ArrowUpRight size={11} weight="bold" className="text-ink-400" />
                         </a>
                       );
                     })}
                   </div>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      )}
+                </div>
+
+                {/* 6. Quick Action Portals (Search & Login) */}
+                <div className="pt-2 space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeDrawer();
+                      onSearchOpen();
+                    }}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-white p-2.5 text-xs font-bold uppercase tracking-wider text-maroon-900 border border-sandstone-200 shadow-xs cursor-pointer"
+                  >
+                    <MagnifyingGlass size={16} weight="bold" />
+                    <span>Search Website</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeDrawer();
+                      onLoginOpen();
+                    }}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-maroon-900 p-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-maroon-800 cursor-pointer"
+                  >
+                    <User size={16} weight="bold" />
+                    <span>Portal Login</span>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </header>
   );
 }
