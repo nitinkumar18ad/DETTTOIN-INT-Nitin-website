@@ -58,8 +58,8 @@ A modern, high-performance, and visually engaging web application for **Vasant V
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/nitinkumar18ad/DETTTOIN-INT-Nitin-website.git
-   cd DETTTOIN-INT-Nitin-website
+   git clone https://github.com/nitinkumar18ad/DETTROIN-INT-Nitin-website.git
+   cd DETTROIN-INT-Nitin-website
    ```
 
 2. **Install Client & Server Dependencies**:
