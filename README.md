@@ -6,10 +6,10 @@ A modern, high-performance, and visually engaging web application for **Vasant V
 
 - **Full Name**: Nitin Kumar
 - **Intern ID**: NA
-- **Email Address**: nitinumar18ad@gmail.com
+- **Email Address**: nitinkumar18ad@gmail.com
 - **GitHub Username**: nitinkumar18ad
 - **Selected Website**: https://www.vasantvalley.org/
-- **Live Demo Link**: https://detttoin-int-nitin-website.vercel.app/
+- **Live Demo Link**: https://dettroin-int-nitin-website.vercel.app/
 
 ---
 

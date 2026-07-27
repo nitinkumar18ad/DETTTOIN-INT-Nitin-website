@@ -13,6 +13,7 @@ import Footer from "./components/Footer.jsx";
 import FaqPage from "./components/FaqPage.jsx";
 import AnnouncementPage from "./components/AnnouncementPage.jsx";
 import VisionPhilosophyPage from "./components/VisionPhilosophyPage.jsx";
+import SkeletonLoader from "./components/SkeletonLoader.jsx";
 import useScrollSpy from "./hooks/useScrollSpy.js";
 
 const fallbackNavItems = [
@@ -98,55 +99,42 @@ const fallbackNewsEvents = [
     date: "2025-11-16",
     month: "November",
     year: 2025,
-    category: "Learning",
-    summary: "Reading circles, guest author interactive sessions, and rare book displays animate the school library. Students participate in creative writing challenges.",
-    highlights: ["Author Q&A", "Book Showcase", "Writing Award"],
+    category: "Academics",
+    summary: "Author interactions, poetry slams, and book illustration contests inspire a love for reading and narrative storytelling throughout the school.",
+    highlights: ["Author Talks", "Poetry Slam", "Book Fair"],
     image: "/images/news/library-week.jpg",
-    href: "#"
-  },
-  {
-    id: "environment-drive",
-    type: "news",
-    title: "Campus Sustainability Drive",
-    date: "2025-09-05",
-    month: "September",
-    year: 2025,
-    category: "Environment",
-    summary: "Students lead campus-wide sustainability initiatives focusing on rainwater harvesting, zero-waste composting, and solar energy awareness across all wings.",
-    highlights: ["Tree Plantation", "Solar Audit", "Zero-Waste"],
-    image: "/images/news/environment-drive.jpg",
     href: "#"
   }
 ];
 
 const featuresData = [
   {
-    id: "about-overview",
-    category: "About Us",
-    heading: "A Legacy of Intellectual Depth and Character",
-    body: "Vasant Valley School was established to provide a space where learning is an interactive and immersive process. Our pedagogy encourages students to be independent thinkers, ethical leaders, and empathetic members of society.",
-    linkText: "Read about our history",
+    id: "campus-life",
+    category: "Life at Vasant Valley",
+    heading: "A Vibrant Community Built on Trust and Reflection",
+    body: "Our campus provides a welcoming environment where students explore their interests across academics, arts, robotics, and athletics. Every learner is encouraged to voice ideas, collaborate across age groups, and grow with confidence.",
+    linkText: "Explore our campus community",
     linkHref: "#about",
     image: "/images/features/about.svg",
-    alt: "Vasant Valley school building outline and lamp illustration",
+    alt: "Vasant Valley campus buildings and greenery illustration",
     isReversed: false,
-    bgColor: "bg-white"
-  },
-  {
-    id: "infrastructure",
-    category: "Campus & Infrastructure",
-    heading: "Designed for Exploration and Excellence",
-    body: "Our campus is a blend of traditional sandstone aesthetics and state-of-the-art facilities. From modern science labs and collaborative studios to expansive athletic grounds, every corner is designed to support academic inquiry and creative expression.",
-    linkText: "Explore our facilities",
-    linkHref: "#infrastructure",
-    image: "/images/features/infrastructure.svg",
-    alt: "Campus sandstone arches architectural design",
-    isReversed: true,
     bgColor: "bg-sandstone-50"
   },
   {
-    id: "learning",
-    category: "Learning Experience",
+    id: "infrastructure",
+    category: "Infrastructure & Spaces",
+    heading: "Designed to Foster Focus, Curiosity, and Health",
+    body: "From quiet library reading nooks and specialized science laboratories to spacious athletic fields, our facilities support deep study, creative work, and active play in a green, sustainable setting.",
+    linkText: "Discover campus facilities",
+    linkHref: "#infrastructure",
+    image: "/images/features/infrastructure.svg",
+    alt: "Modern school architecture and green campus trees illustration",
+    isReversed: true,
+    bgColor: "bg-[#f4efe6]"
+  },
+  {
+    id: "academic-model",
+    category: "Pedagogy & Growth",
     heading: "Inquiry, Creativity, and Critical Thought",
     body: "We believe in a curriculum that goes beyond rote memorization. Through project-based learning, interactive seminars, and robust co-curricular programs, students build the skills to solve real-world problems and adapt to a changing world.",
     linkText: "Our academic model",
@@ -159,6 +147,7 @@ const featuresData = [
 ];
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState("home"); // "home" | "faq" | "announcement" | "vision"
   const [navItems, setNavItems] = useState(() => sanitizeNavItems(fallbackNavItems));
   const [values, setValues] = useState(fallbackValues);
@@ -166,6 +155,15 @@ export default function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const lenisRef = useRef(null);
+
+  // WhatsApp-style 1.0s initial loading splash while page pre-loads in background
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const sectionIds = [
     "main-content",
@@ -181,7 +179,7 @@ export default function App() {
   useEffect(() => {
     // Respect prefers-reduced-motion
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (mediaQuery.matches) return;
+    if (mediaQuery.matches) return undefined;
 
     const lenis = new Lenis({
       duration: 1.2,
@@ -271,6 +269,9 @@ export default function App() {
 
   return (
     <>
+      {/* Background Page Elements render immediately so content/images pre-load */}
+      <SkeletonLoader isVisible={isLoading} />
+
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-heritage focus:border focus:border-sandstone-200 focus:bg-white focus:px-4 focus:py-2.5 focus:font-semibold focus:text-maroon-700 focus:shadow-soft"
@@ -294,7 +295,7 @@ export default function App() {
       ) : currentPage === "vision" ? (
         <VisionPhilosophyPage onNavigateHome={() => handleNavigate("home")} />
       ) : (
-        <main tabIndex="-1" className="min-h-dvh bg-sandstone-50 text-ink-900 focus:outline-none">
+        <main tabIndex="-1" className="min-h-dvh bg-sandstone-50 text-ink-900 focus:outline-none animate-in fade-in duration-300">
           <MainHero />
           {/* Unified About Us section spanning from MissionBlock through all SplitFeatures until Core Values */}
           <div id="about" className="scroll-mt-20">

@@ -98,6 +98,22 @@ p {
   margin: 0;
 }
 
+@keyframes whatsapp-progress {
+  0% {
+    transform: scaleX(0);
+  }
+  50% {
+    transform: scaleX(0.65);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.animate-whatsapp-progress {
+  animation: whatsapp-progress 1.0s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
 
   *,
