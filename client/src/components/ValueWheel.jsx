@@ -324,13 +324,13 @@ export default function ValueWheel({ values = [] }) {
 
       {/* Desktop Radial Wheel Layout (lg and above) */}
       <motion.div
-        className="hidden lg:flex justify-center items-center h-[520px] relative"
+        className="hidden lg:flex justify-center items-center h-130 relative"
         initial={false}
         animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
         style={{ willChange: "transform, opacity" }}
       >
-        <div className="w-[280px] h-[280px] rounded-full bg-white shadow-soft border border-sandstone-100 flex flex-col justify-center items-center z-10 p-6 text-center select-none relative overflow-hidden">
+        <div className="w-70 h-70 rounded-full bg-white shadow-soft border border-sandstone-100 flex flex-col justify-center items-center z-10 p-6 text-center select-none relative overflow-hidden">
           <motion.div
             aria-hidden="true"
             className="absolute inset-6 rounded-full bg-maroon-100/20 blur-3xl"
@@ -382,7 +382,7 @@ export default function ValueWheel({ values = [] }) {
                 style={{ willChange: "transform, opacity" }}
               >
                 <p className="text-maroon-900 font-serif font-semibold text-lg">Ethos Wheel</p>
-                <p className="text-xs mt-3 text-ink-500 max-w-[200px] leading-relaxed">
+                <p className="text-xs mt-3 text-ink-500 max-w-50 leading-relaxed">
                   Hover, focus, or tap any node around the wheel to explore our values.
                 </p>
               </motion.div>
@@ -392,7 +392,7 @@ export default function ValueWheel({ values = [] }) {
 
         <motion.div
           aria-hidden="true"
-          className="absolute w-[440px] h-[440px] rounded-full border border-dashed border-sandstone-300"
+          className="absolute w-110 h-110 rounded-full border border-dashed border-sandstone-300"
           animate={{ rotate: 360 }}
           transition={{ duration: 60, ease: "linear", repeat: Infinity }}
           style={{ willChange: "transform" }}
