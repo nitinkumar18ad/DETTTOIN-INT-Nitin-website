@@ -45,32 +45,105 @@ function computeCircleGeometry(w, h) {
 
 /* ─── Single animated pill ──────────────────────────────────────────────
  * Renders one nav link as a pill with the rising-circle hover animation.
- * Exposes an imperative ref so the parent can run geometry layout.
+ * Manages its own GSAP timeline via useEffect, rebuilding when isActive changes.
  */
-function NavPill({ item, index, circleRefs, tlRefs, activeTweenRefs, isActive }) {
-  const pillRef = useRef(null);
+function NavPill({ item, isActive }) {
+  const pillRef      = useRef(null);
+  const circleRef    = useRef(null);
+  const labelRef     = useRef(null);
+  const hoverLabelRef = useRef(null);
+  const tlRef        = useRef(null);
+  const activeTweenRef = useRef(null);
 
-  const handleEnter = () => {
-    const tl = tlRefs.current[index];
+  // Build / rebuild hover timeline when active state or item changes
+  useEffect(() => {
+    const circle = circleRef.current;
+    const pill   = pillRef.current;
+    if (!circle || !pill) return;
+
+    const rect = pill.getBoundingClientRect();
+    const { w, h } = { w: rect.width, h: rect.height };
+    if (!w || !h) return;
+
+    const { D, delta, originY } = computeCircleGeometry(w, h);
+
+    circle.style.width  = `${D}px`;
+    circle.style.height = `${D}px`;
+    circle.style.bottom = `-${delta}px`;
+
+    gsap.set(circle, {
+      xPercent: -50,
+      scale: 0,
+      transformOrigin: `50% ${originY}px`,
+      display: isActive ? "none" : "block",
+    });
+
+    const label = labelRef.current;
+    const hoverLabel = hoverLabelRef.current;
+    if (label) gsap.set(label, { y: 0 });
+    if (hoverLabel) gsap.set(hoverLabel, { y: h + 12, opacity: 0 });
+
+    tlRef.current?.kill();
+    const tl = gsap.timeline({ paused: true });
+
+    tl.to(circle, {
+      scale: 1.2,
+      xPercent: -50,
+      duration: 0.8,
+      ease: EASE,
+      overwrite: "auto",
+    }, 0);
+
+    if (label) {
+      tl.to(label, {
+        y: -(h + 8),
+        duration: 0.6,
+        ease: EASE,
+        overwrite: "auto",
+      }, 0);
+    }
+
+    if (hoverLabel) {
+      gsap.set(hoverLabel, { y: Math.ceil(h + 20), opacity: 0 });
+      tl.to(hoverLabel, {
+        y: 0,
+        opacity: 1,
+        duration: 0.6,
+        ease: EASE,
+        overwrite: "auto",
+      }, 0);
+    }
+
+    tlRef.current = tl;
+
+    return () => {
+      tlRef.current?.kill();
+    };
+  }, [isActive, item.id]);
+
+  const handleEnter = useCallback(() => {
+    if (isActive) return; // No hover animation on active pill
+    const tl = tlRef.current;
     if (!tl) return;
-    activeTweenRefs.current[index]?.kill();
-    activeTweenRefs.current[index] = tl.tweenTo(tl.duration(), {
+    activeTweenRef.current?.kill();
+    activeTweenRef.current = tl.tweenTo(tl.duration(), {
       duration: 0.4,
       ease: EASE,
       overwrite: "auto",
     });
-  };
+  }, [isActive]);
 
-  const handleLeave = () => {
-    const tl = tlRefs.current[index];
+  const handleLeave = useCallback(() => {
+    if (isActive) return;
+    const tl = tlRef.current;
     if (!tl) return;
-    activeTweenRefs.current[index]?.kill();
-    activeTweenRefs.current[index] = tl.tweenTo(0, {
+    activeTweenRef.current?.kill();
+    activeTweenRef.current = tl.tweenTo(0, {
       duration: 0.3,
       ease: EASE,
       overwrite: "auto",
     });
-  };
+  }, [isActive]);
 
   return (
     <li role="none" className="flex items-center">
@@ -84,30 +157,29 @@ function NavPill({ item, index, circleRefs, tlRefs, activeTweenRefs, isActive })
         onMouseLeave={handleLeave}
         onFocus={handleEnter}
         onBlur={handleLeave}
-        className={`relative overflow-hidden inline-flex items-center justify-center h-9 self-center no-underline rounded-full px-6 font-semibold text-sm uppercase tracking-wider cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sandstone-50 focus-visible:ring-offset-1 focus-visible:ring-offset-maroon-900 ${
-          isActive ? "bg-maroon-700 text-sandstone-50" : ""
+        className={`relative overflow-hidden inline-flex items-center justify-center h-9 self-center no-underline rounded-full px-6 font-semibold text-sm uppercase tracking-wider cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sandstone-50 focus-visible:ring-offset-1 focus-visible:ring-offset-maroon-900 transition-colors duration-300 ease-out ${
+          isActive ? "bg-maroon-700 text-sandstone-50" : "bg-sandstone-50 text-ink-900 hover:bg-sandstone-100"
         }`}
-        style={{ background: isActive ? BASE_COLOR : PILL_COLOR, color: isActive ? HOVER_TEXT : DEFAULT_TEXT }}
       >
-        {/* Rising background circle - only show on non-active pills */}
-        {!isActive && (
-          <span
-            className="absolute left-1/2 bottom-0 rounded-full pointer-events-none z-1 block"
-            style={{ background: BASE_COLOR, willChange: "transform" }}
-            aria-hidden="true"
-            ref={(el) => { circleRefs.current[index] = el; }}
-          />
-        )}
+        {/* Rising background circle - always rendered, hidden via GSAP when active */}
+        <span
+          ref={circleRef}
+          className="absolute left-1/2 bottom-0 rounded-full pointer-events-none z-1 block"
+          style={{ background: BASE_COLOR, willChange: "transform" }}
+          aria-hidden="true"
+        />
 
         {/* Label stack: default slides up, hover slides in from below */}
         <span className="label-stack relative inline-block leading-none z-[2] overflow-hidden py-0.5">
           <span
+            ref={labelRef}
             className="pill-label relative inline-block z-[2]"
             style={{ willChange: "transform" }}
           >
             {item.label}
           </span>
           <span
+            ref={hoverLabelRef}
             className="pill-label-hover absolute left-0 top-1 inline-block w-full text-center z-[3]"
             style={{ color: HOVER_TEXT, willChange: "transform, opacity" }}
             aria-hidden="true"
@@ -138,87 +210,12 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
     return () => { document.body.style.overflow = ""; };
   }, [isDrawerOpen]);
 
-  /* — GSAP refs (one entry per nav item) — */
-  const circleRefs      = useRef([]);
-  const tlRefs          = useRef([]);
-  const activeTweenRefs = useRef([]);
-  const navBarRef       = useRef(null);
-
-  /* — Build / rebuild pill geometry whenever navItems change — */
+  /* — Entrance animation: runs once on mount — */
+  const navBarRef = useRef(null);
   useEffect(() => {
     if (!navItems.length) return;
 
-    function layout() {
-      circleRefs.current.forEach((circle, index) => {
-        if (!circle?.parentElement) return;
-
-        const pill  = circle.parentElement;
-        const rect  = pill.getBoundingClientRect();
-        const { w, h } = { w: rect.width, h: rect.height };
-
-        /* skip un-mounted items */
-        if (!w || !h) return;
-
-        const { D, delta, originY } = computeCircleGeometry(w, h);
-
-        /* position the circle element */
-        circle.style.width  = `${D}px`;
-        circle.style.height = `${D}px`;
-        circle.style.bottom = `-${delta}px`;
-
-        gsap.set(circle, {
-          xPercent: -50,
-          scale: 0,
-          transformOrigin: `50% ${originY}px`,
-        });
-
-        /* reset label positions */
-        const label = pill.querySelector(".pill-label");
-        const hover = pill.querySelector(".pill-label-hover");
-        if (label) gsap.set(label, { y: 0 });
-        if (hover) gsap.set(hover, { y: h + 12, opacity: 0 });
-
-        /* build hover timeline */
-        tlRefs.current[index]?.kill();
-        const tl = gsap.timeline({ paused: true });
-
-        tl.to(circle, {
-          scale: 1.2,
-          xPercent: -50,
-          duration: 0.8,
-          ease: EASE,
-          overwrite: "auto",
-        }, 0);
-
-        if (label) {
-          tl.to(label, {
-            y: -(h + 8),
-            duration: 0.6,
-            ease: EASE,
-            overwrite: "auto",
-          }, 0);
-        }
-
-        if (hover) {
-          gsap.set(hover, { y: Math.ceil(h + 20), opacity: 0 });
-          tl.to(hover, {
-            y: 0,
-            opacity: 1,
-            duration: 0.6,
-            ease: EASE,
-            overwrite: "auto",
-          }, 0);
-        }
-
-        tlRefs.current[index] = tl;
-      });
-    }
-
-    /* short delay to let the DOM paint pill dimensions */
     const raf = requestAnimationFrame(() => {
-      layout();
-
-      /* entrance animation: pills stagger in from left */
       const pills = navBarRef.current?.querySelectorAll("[role='menuitem']");
       if (pills?.length) {
         gsap.fromTo(
@@ -236,16 +233,8 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
       }
     });
 
-    const onResize = () => layout();
-    window.addEventListener("resize", onResize);
-    if (document.fonts) document.fonts.ready.then(layout).catch(() => {});
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", onResize);
-      tlRefs.current.forEach((tl) => tl?.kill());
-    };
-  }, [navItems]);
+    return () => cancelAnimationFrame(raf);
+  }, [navItems.length]); // Only re-run if number of nav items changes
 
   return (
     <header className="sticky top-0 z-40 border-b border-sandstone-200 bg-sandstone-50/95 backdrop-blur">
@@ -293,17 +282,13 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
             role="none"
             className="list-none flex items-stretch m-0 p-0 h-full gap-3"
           >
-            {navItems.map((item, index) => {
+            {navItems.map((item) => {
               // Extract section ID from href (e.g., "#main-content" -> "main-content")
               const sectionId = item.href?.startsWith("#") ? item.href.slice(1) : item.id;
               return (
                 <NavPill
                   key={item.id}
                   item={item}
-                  index={index}
-                  circleRefs={circleRefs}
-                  tlRefs={tlRefs}
-                  activeTweenRefs={activeTweenRefs}
                   isActive={activeSection === sectionId}
                 />
               );
