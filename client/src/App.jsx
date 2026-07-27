@@ -4,8 +4,6 @@ import Navbar from "./components/Navbar.jsx";
 import SearchOverlay from "./components/SearchOverlay.jsx";
 import MainHero from "./components/MainHero.jsx";
 import MissionBlock from "./components/MissionBlock.jsx";
-import AnnouncementsGrid from "./components/AnnouncementsGrid.jsx";
-import MottoSection from "./components/MottoSection.jsx";
 import SplitFeature from "./components/SplitFeature.jsx";
 import ValueWheel from "./components/ValueWheel.jsx";
 import NewsTimeline from "./components/NewsTimeline.jsx";
@@ -16,27 +14,19 @@ import useScrollSpy from "./hooks/useScrollSpy.js";
 const fallbackNavItems = [
   { id: "main-content", label: "Home", href: "#main-content", children: [] },
   { id: "about", label: "About Us", href: "#about", children: [] },
-  { id: "announcements", label: "Announcements", href: "#announcements", children: [] },
   { id: "news-events", label: "News & Events", href: "#news-events", children: [] },
   { id: "footer", label: "Contact", href: "#footer", children: [] }
 ];
 
 function sanitizeNavItems(items) {
   return (items?.length ? items : fallbackNavItems).filter(
-    (item) => item.id !== "school-life" && item.label !== "School Life"
+    (item) =>
+      item.id !== "school-life" &&
+      item.label !== "School Life" &&
+      item.id !== "announcements" &&
+      item.label !== "Announcements"
   );
 }
-
-const fallbackAnnouncements = [
-  {
-    id: "admissions-open",
-    title: "Admissions Notice",
-    date: "2026-01-10",
-    category: "Admissions",
-    summary: "Application information and key dates for the upcoming academic session.",
-    href: "#"
-  }
-];
 
 const fallbackHeroSlides = [
   {
@@ -196,7 +186,6 @@ const featuresData = [
 
 export default function App() {
   const [navItems, setNavItems] = useState(() => sanitizeNavItems(fallbackNavItems));
-  const [announcements, setAnnouncements] = useState(fallbackAnnouncements);
   const [heroSlides, setHeroSlides] = useState(fallbackHeroSlides);
   const [values, setValues] = useState(fallbackValues);
   const [newsEvents, setNewsEvents] = useState(fallbackNewsEvents);
@@ -205,22 +194,17 @@ export default function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  // Section IDs that exist in the DOM for scroll spy
   const sectionIds = [
-    "main-content", // Hero section
-    "mission", // MissionBlock
-    "motto", // MottoSection
-    "about", // SplitFeature - about
-    "infrastructure", // SplitFeature - infrastructure
-    "learning", // SplitFeature - learning
-    "announcements", // AnnouncementsGrid
-    "values", // ValueWheel
-    "news-events", // NewsTimeline
-    "instagram-feed", // InstagramFeed
-    "footer", // Footer
+    "main-content",
+    "about",
+    "infrastructure",
+    "learning",
+    "values",
+    "news-events",
+    "instagram-feed",
+    "footer"
   ];
 
-  // Track active section for scroll spy
   const activeSection = useScrollSpy({ sectionIds });
 
   useEffect(() => {
@@ -238,7 +222,6 @@ export default function App() {
         const data = await response.json();
         if (isMounted) {
           setNavItems(sanitizeNavItems(data.navItems));
-          setAnnouncements(data.announcements || fallbackAnnouncements);
           setHeroSlides(data.heroSlides || fallbackHeroSlides);
           setValues(data.values || fallbackValues);
           setNewsEvents(data.newsEvents || fallbackNewsEvents);
@@ -247,7 +230,6 @@ export default function App() {
       } catch (err) {
         if (isMounted) {
           setNavItems(sanitizeNavItems(fallbackNavItems));
-          setAnnouncements(fallbackAnnouncements);
           setHeroSlides(fallbackHeroSlides);
           setValues(fallbackValues);
           setNewsEvents(fallbackNewsEvents);
@@ -278,10 +260,9 @@ export default function App() {
         Skip to main content
       </a>
       <Navbar navItems={navItems} onSearchOpen={openSearch} onLoginOpen={openLogin} activeSection={activeSection} />
-      <main id="main-content" tabIndex="-1" className="min-h-[100dvh] bg-sandstone-50 text-ink-900 focus:outline-none">
+      <main id="main-content" tabIndex="-1" className="min-h-dvh bg-sandstone-50 text-ink-900 focus:outline-none">
         <MainHero />
         <MissionBlock />
-        <MottoSection />
         {featuresData.map((feature) => (
           <SplitFeature
             key={feature.id}
@@ -297,18 +278,12 @@ export default function App() {
             bgColor={feature.bgColor}
           />
         ))}
-        <AnnouncementsGrid announcements={announcements} isLoading={isLoading} error={error} />
         <ValueWheel values={values} />
         <NewsTimeline newsEvents={newsEvents} />
         <InstagramFeed />
       </main>
       <Footer onLoginOpen={openLogin} />
-      <SearchOverlay
-        isOpen={isSearchOpen}
-        onClose={closeSearch}
-        navItems={navItems}
-        announcements={announcements}
-      />
+      <SearchOverlay isOpen={isSearchOpen} onClose={closeSearch} navItems={navItems} />
       <LoginModal isOpen={isLoginOpen} onClose={closeLogin} />
     </>
   );

@@ -2,7 +2,7 @@ import { X } from "@phosphor-icons/react";
 import { useCallback, useMemo, useState } from "react";
 import useFocusTrap from "../hooks/useFocusTrap.js";
 
-export default function SearchOverlay({ isOpen, onClose, navItems = [], announcements = [] }) {
+export default function SearchOverlay({ isOpen, onClose, navItems = [] }) {
   const [query, setQuery] = useState("");
   const closeSearch = useCallback(() => onClose(), [onClose]);
   const dialogRef = useFocusTrap(isOpen, closeSearch);
@@ -23,17 +23,10 @@ export default function SearchOverlay({ isOpen, onClose, navItems = [], announce
       }))
     ]);
 
-    const announcementResults = announcements.map((item) => ({
-      id: item.id,
-      label: item.title,
-      type: item.category,
-      href: item.href
-    }));
-
-    return [...navResults, ...announcementResults].filter((item) =>
+    return navResults.filter((item) =>
       item.label.toLowerCase().includes(normalizedQuery)
     );
-  }, [announcements, navItems, query]);
+  }, [navItems, query]);
 
   if (!isOpen) {
     return null;
@@ -53,7 +46,7 @@ export default function SearchOverlay({ isOpen, onClose, navItems = [], announce
             <h2 id="search-title" className="text-3xl">
               Search
             </h2>
-            <p className="mt-1 text-ink-700">Find navigation links and announcements.</p>
+            <p className="mt-1 text-ink-700">Find navigation links across the site.</p>
           </div>
           <button
             type="button"
