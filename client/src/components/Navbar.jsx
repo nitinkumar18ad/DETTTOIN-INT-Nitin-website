@@ -1,17 +1,14 @@
-/**
- * Navbar — sticky header with PillNav-style GSAP rising-circle pill animation.
- *
- * Desktop: logo pill (maroon-900 bg) + individual nav-link pills in a shared
- *          maroon-900 container. Hovering any pill triggers a "rising circle"
- *          animation that fills it from below, white-text label slides in.
- *
- * Mobile:  hamburger opens an accessible focus-trapped drawer (existing a11y).
- *
- * GSAP rising-circle technique adapted from PillNav component.
- * All other a11y (focus trap, Escape close, aria roles) is preserved as-is.
- */
 import { gsap } from "gsap";
-import { List, MagnifyingGlass, User, X } from "@phosphor-icons/react";
+import {
+  List,
+  MagnifyingGlass,
+  User,
+  X,
+  Question,
+  Compass,
+  CaretDown,
+  BookOpen
+} from "@phosphor-icons/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useFocusTrap from "../hooks/useFocusTrap.js";
 import useScrollSpy from "../hooks/useScrollSpy.js";
@@ -26,13 +23,6 @@ function flattenNav(navItems) {
   return navItems.flatMap((item) => [item, ...(item.children || [])]);
 }
 
-/* ─── Rising-circle geometry ────────────────────────────────────────────
- * Given a pill's width (w) and height (h), compute a circle large enough
- * to cover the pill from a bottom-center origin point.
- *   R = radius of the circumscribed circle for the pill rectangle
- *   D = circle diameter (+ 2px safety margin)
- *   delta = how far the circle centre sits below the pill bottom
- */
 function computeCircleGeometry(w, h) {
   const R = ((w * w) / 4 + h * h) / (2 * h);
   const D = Math.ceil(2 * R) + 2;
@@ -41,11 +31,8 @@ function computeCircleGeometry(w, h) {
   return { D, delta, originY };
 }
 
-/* ─── Single animated pill ──────────────────────────────────────────────
- * Renders one nav link as a pill with the rising-circle hover animation.
- * Manages its own GSAP timeline via useEffect, rebuilding when isActive changes.
- */
-function NavPill({ item, isActive }) {
+/* ─── Single animated pill ────────────────────────────────────────────── */
+function NavPill({ item, isActive, onClick, hasDropdown }) {
   const pillRef = useRef(null);
   const circleRef = useRef(null);
   const labelRef = useRef(null);
@@ -58,7 +45,6 @@ function NavPill({ item, isActive }) {
     isActiveRef.current = isActive;
   }, [isActive]);
 
-  // Build hover timeline once when item.id changes
   useEffect(() => {
     const circle = circleRef.current;
     const pill = pillRef.current;
@@ -75,7 +61,7 @@ function NavPill({ item, isActive }) {
 
     const rect = pill.getBoundingClientRect();
     const { w, h } = { w: rect.width, h: rect.height };
-    if (!w || !h) return;
+    if (!w || !h) return undefined;
 
     const { D, delta, originY } = computeCircleGeometry(w, h);
 
@@ -98,15 +84,14 @@ function NavPill({ item, isActive }) {
 
     tl.to(circle, {
       scale: 1.2,
-      xPercent: -50,
-      duration: 0.45,
+      duration: 0.4,
       ease: EASE,
       overwrite: "auto",
     }, 0);
 
     if (label) {
       tl.to(label, {
-        y: -(h + 8),
+        y: -Math.ceil(h + 20),
         duration: 0.4,
         ease: EASE,
         overwrite: "auto",
@@ -133,7 +118,6 @@ function NavPill({ item, isActive }) {
     };
   }, [item.id]);
 
-  // Trigger animation when active state changes from scroll spy
   useEffect(() => {
     const tl = tlRef.current;
     if (!tl) return;
@@ -176,23 +160,25 @@ function NavPill({ item, isActive }) {
       ease: EASE,
       overwrite: "auto",
     });
-  }, []);
+  }, [isActive]);
 
   return (
-    <li role="none" className="flex items-center">
+    <li role="none" className="flex items-center relative">
       <a
         ref={pillRef}
         role="menuitem"
         href={item.href}
+        onClick={onClick}
         aria-label={item.ariaLabel || item.label}
         aria-current={isActive ? "page" : undefined}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onFocus={handleEnter}
         onBlur={handleLeave}
-        className={`pill-nav-link relative inline-flex h-10 self-center items-center justify-center overflow-hidden rounded-full px-5 text-sm font-semibold uppercase tracking-wider no-underline select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-maroon-900 bg-white hover:bg-white ${isActive ? "text-maroon-900" : "text-ink-900"}`}
+        className={`pill-nav-link relative inline-flex h-10 self-center items-center justify-center overflow-hidden rounded-full px-5 text-sm font-semibold uppercase tracking-wider no-underline select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-maroon-900 bg-white hover:bg-white ${
+          isActive ? "text-maroon-900" : "text-ink-900"
+        }`}
       >
-        {/* Rising background circle - always rendered, hidden via GSAP when active */}
         <span
           ref={circleRef}
           className="absolute left-1/2 bottom-0 rounded-full pointer-events-none z-1 block"
@@ -200,22 +186,23 @@ function NavPill({ item, isActive }) {
           aria-hidden="true"
         />
 
-        {/* Label stack: default slides up, hover slides in from below */}
-        <span className="label-stack relative inline-block leading-none z-[2] overflow-hidden py-0.5">
+        <span className="label-stack relative inline-flex items-center gap-1 leading-none z-[2] overflow-hidden py-0.5">
           <span
             ref={labelRef}
-            className="pill-label relative inline-block z-[2]"
+            className="pill-label relative inline-flex items-center gap-1 z-[2]"
             style={{ willChange: "transform" }}
           >
             {item.label}
+            {hasDropdown && <CaretDown size={12} weight="bold" className="mt-0.5" />}
           </span>
           <span
             ref={hoverLabelRef}
-            className="pill-label-hover absolute left-0 top-1 inline-block w-full text-center z-[3]"
+            className="pill-label-hover absolute left-0 top-1 inline-flex items-center justify-center gap-1 w-full text-center z-[3]"
             style={{ color: HOVER_TEXT, willChange: "transform, opacity" }}
             aria-hidden="true"
           >
             {item.label}
+            {hasDropdown && <CaretDown size={12} weight="bold" className="mt-0.5" />}
           </span>
         </span>
       </a>
@@ -224,24 +211,31 @@ function NavPill({ item, isActive }) {
 }
 
 /* ─── Main Navbar ───────────────────────────────────────────────────────── */
-export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activeSection: activeSectionProp }) {
-  /* — mobile drawer state & a11y — */
+export default function Navbar({
+  navItems = [],
+  onSearchOpen,
+  onLoginOpen,
+  activeSection: activeSectionProp,
+  currentPage = "home",
+  onNavigate
+}) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isAboutHovered, setIsAboutHovered] = useState(false);
+  const hoverTimerRef = useRef(null);
+
   const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
   const drawerRef = useFocusTrap(isDrawerOpen, closeDrawer);
   const allLinks = flattenNav(navItems);
 
-  /* — scroll spy for active section — */
   const sectionIds = navItems.map((item) => item.href?.replace("#", "")).filter(Boolean);
   const activeSectionSpy = useScrollSpy({ sectionIds });
-  const activeSection = activeSectionProp ?? activeSectionSpy;
+  const activeSection = currentPage === "home" ? (activeSectionProp ?? activeSectionSpy) : null;
 
   useEffect(() => {
     document.body.style.overflow = isDrawerOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [isDrawerOpen]);
 
-  /* — Entrance animation: runs once on mount — */
   const navBarRef = useRef(null);
   useEffect(() => {
     if (!navItems.length) return;
@@ -265,7 +259,28 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
     });
 
     return () => cancelAnimationFrame(raf);
-  }, [navItems.length]); // Only re-run if number of nav items changes
+  }, [navItems.length]);
+
+  const handleAboutMouseEnter = () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    setIsAboutHovered(true);
+  };
+
+  const handleAboutMouseLeave = () => {
+    hoverTimerRef.current = setTimeout(() => {
+      setIsAboutHovered(false);
+    }, 180);
+  };
+
+  const handleFaqClick = (e) => {
+    e.preventDefault();
+    setIsAboutHovered(false);
+    if (onNavigate) onNavigate("faq");
+  };
+
+  const handleHomeClick = (e, href) => {
+    if (onNavigate) onNavigate("home");
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/30 bg-white/40 backdrop-blur-lg shadow-sm">
@@ -273,11 +288,11 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
         aria-label="Primary navigation"
         className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
       >
-
         {/* ── Logo ──────────────────────────────────────────────────── */}
         <a
           href="#main-content"
-          className="flex flex-shrink-0 items-center gap-3 no-underline"
+          onClick={(e) => handleHomeClick(e, "#main-content")}
+          className="flex flex-shrink-0 items-center gap-3 no-underline cursor-pointer"
           aria-label="Vasant Valley School — home"
         >
           <img
@@ -298,10 +313,7 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
           </span>
         </a>
 
-        {/* ── Desktop pill nav ────────────────────────────────────────
-             Maroon-900 pill container; each nav item is its own
-             sandstone-50 pill with a GSAP rising-circle hover effect.
-        ──────────────────────────────────────────────────────────── */}
+        {/* ── Desktop Pill Nav ──────────────────────────────────────── */}
         <div
           ref={navBarRef}
           className="hidden items-center gap-2 rounded-full p-1.5 lg:flex"
@@ -314,25 +326,72 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
             className="m-0 flex h-full list-none items-stretch gap-2 p-0"
           >
             {navItems.map((item) => {
-              // Extract section ID from href (e.g., "#main-content" -> "main-content")
               const sectionId = item.href?.startsWith("#") ? item.href.slice(1) : item.id;
+              const isAbout = item.id === "about";
+              const isActive = currentPage === "home" && activeSection === sectionId;
+
+              if (isAbout) {
+                return (
+                  <div
+                    key={item.id}
+                    className="relative flex items-center"
+                    onMouseEnter={handleAboutMouseEnter}
+                    onMouseLeave={handleAboutMouseLeave}
+                  >
+                    <NavPill
+                      item={item}
+                      isActive={isActive}
+                      hasDropdown={true}
+                      onClick={(e) => handleHomeClick(e, item.href)}
+                    />
+
+                    {/* Minimal About Us Hover Dropdown Menu */}
+                    {isAboutHovered && (
+                      <div className="absolute top-full left-0 mt-2 w-48 rounded-2xl bg-white/95 backdrop-blur-xl border border-sandstone-200/90 shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                        <a
+                          href="#about"
+                          onClick={(e) => {
+                            setIsAboutHovered(false);
+                            handleHomeClick(e, "#about");
+                          }}
+                          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline"
+                        >
+                          <Compass size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                          <span>Overview</span>
+                        </a>
+
+                        <a
+                          href="#faq"
+                          onClick={handleFaqClick}
+                          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-maroon-950 hover:bg-maroon-50 hover:text-maroon-900 transition-colors group no-underline"
+                        >
+                          <Question size={16} weight="bold" className="text-maroon-700 shrink-0" />
+                          <span>FAQ Section</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
               return (
                 <NavPill
                   key={item.id}
                   item={item}
-                  isActive={activeSection === sectionId}
+                  isActive={isActive}
+                  onClick={(e) => handleHomeClick(e, item.href)}
                 />
               );
             })}
           </ul>
         </div>
 
-        {/* ── Action buttons (search, login, hamburger) ────────────── */}
+        {/* ── Action Buttons (Search, Login, Hamburger) ────────────── */}
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onSearchOpen}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-heritage text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-heritage text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 cursor-pointer"
             aria-label="Open search"
           >
             <MagnifyingGlass size={22} weight="bold" />
@@ -351,100 +410,82 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-heritage text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 lg:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-heritage text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 lg:hidden cursor-pointer"
             aria-label="Open menu"
-            aria-haspopup="dialog"
+            aria-expanded={isDrawerOpen}
           >
             <List size={24} weight="bold" />
           </button>
         </div>
+
       </nav>
 
-      {/* ── Mobile drawer (focus-trapped, Escape closes) ───────────── */}
-      {isDrawerOpen ? (
-        <div
-          className="fixed inset-0 z-50 bg-ink-900/35 lg:hidden"
-          role="presentation"
-          onClick={(e) => { if (e.target === e.currentTarget) closeDrawer(); }}
-        >
+      {/* ── Mobile Drawer Menu ────────────────────────────────────── */}
+      {isDrawerOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+            onClick={closeDrawer}
+            aria-hidden="true"
+          />
+
           <div
             ref={drawerRef}
             role="dialog"
             aria-modal="true"
-            aria-labelledby="mobile-menu-title"
-            className="ml-auto flex h-[100dvh] w-full max-w-sm flex-col bg-sandstone-50 p-5 shadow-soft"
+            aria-label="Navigation Menu"
+            className="fixed inset-y-0 right-0 flex w-full max-w-sm flex-col bg-sandstone-50 p-6 shadow-2xl transition-transform"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 id="mobile-menu-title" className="text-3xl">
-                  Menu
-                </h2>
-                <div className="mt-3 flex items-center gap-3">
-                  <img
-                    src="/logo.svg"
-                    alt=""
-                    className="h-11 w-auto max-w-[64px] shrink-0 object-contain"
-                    width={64}
-                    height={44}
-                    decoding="async"
-                  />
-                  <span className="flex flex-col leading-tight">
-                    <span className="font-serif text-xl font-bold text-maroon-900">
-                      Vasant Valley
-                    </span>
-                    <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-700">
-                      School
-                    </span>
-                  </span>
-                </div>
-              </div>
+            <div className="flex items-center justify-between border-b border-sandstone-200 pb-4">
+              <span className="font-serif text-lg font-bold text-maroon-900">Menu</span>
               <button
                 type="button"
                 onClick={closeDrawer}
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-heritage text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500"
+                className="rounded-heritage p-2 text-ink-700 hover:bg-sandstone-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 cursor-pointer"
                 aria-label="Close menu"
               >
-                <X size={22} weight="bold" />
+                <X size={24} weight="bold" />
               </button>
             </div>
 
-            <nav className="mt-8 grid gap-2" aria-label="Mobile navigation">
-              {allLinks.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.href}
-                  onClick={closeDrawer}
-                  className={`rounded-heritage border px-4 py-3 font-semibold no-underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 ${activeSection === item.id
-                    ? "border-maroon-300 bg-maroon-50 text-maroon-900"
-                    : "border-sandstone-200 bg-white text-ink-900 hover:border-maroon-100 hover:bg-maroon-50 hover:text-maroon-700"
-                    }`}
-                  aria-current={activeSection === item.id ? "page" : undefined}
-                >
-                  {item.label}
-                </a>
-              ))}
+            <nav aria-label="Mobile navigation" className="mt-6 flex-1 overflow-y-auto">
+              <ul className="flex flex-col gap-2">
+                {allLinks.map((item) => (
+                  <li key={item.id}>
+                    <a
+                      href={item.href}
+                      onClick={(e) => {
+                        closeDrawer();
+                        handleHomeClick(e, item.href);
+                      }}
+                      className="block rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-ink-900 hover:bg-maroon-50 hover:text-maroon-700 no-underline"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+                {/* Mobile FAQ Link */}
+                <li className="pt-2 border-t border-sandstone-200">
+                  <a
+                    href="#faq"
+                    onClick={(e) => {
+                      closeDrawer();
+                      handleFaqClick(e);
+                    }}
+                    className="flex items-center justify-between rounded-heritage px-4 py-3 font-semibold uppercase tracking-wider text-maroon-900 bg-maroon-50 hover:bg-maroon-100 no-underline"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Question size={18} weight="bold" />
+                      <span>FAQ Page</span>
+                    </span>
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-maroon-900 text-white">NEW</span>
+                  </a>
+                </li>
+              </ul>
             </nav>
-
-            {/* Login shortcut inside drawer */}
-            <div className="mt-auto border-t border-sandstone-200 pt-6 flex gap-3">
-              <button
-                type="button"
-                onClick={() => { closeDrawer(); onLoginOpen(); }}
-                className="flex-1 rounded-heritage bg-maroon-700 px-4 py-3 font-semibold text-white hover:bg-maroon-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500"
-              >
-                Student Login
-              </button>
-              <button
-                type="button"
-                onClick={() => { closeDrawer(); onLoginOpen(); }}
-                className="flex-1 rounded-heritage border border-maroon-700 px-4 py-3 font-semibold text-maroon-700 hover:bg-maroon-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500"
-              >
-                Parent Login
-              </button>
-            </div>
           </div>
         </div>
-      ) : null}
+      )}
     </header>
   );
 }

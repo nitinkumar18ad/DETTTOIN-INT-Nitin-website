@@ -10,6 +10,7 @@ import ValueWheel from "./components/ValueWheel.jsx";
 import NewsTimeline from "./components/NewsTimeline.jsx";
 import InstagramFeed from "./components/InstagramFeed.jsx";
 import Footer from "./components/Footer.jsx";
+import FaqPage from "./components/FaqPage.jsx";
 import useScrollSpy from "./hooks/useScrollSpy.js";
 
 const fallbackNavItems = [
@@ -156,6 +157,7 @@ const featuresData = [
 ];
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState("home"); // "home" | "faq"
   const [navItems, setNavItems] = useState(() => sanitizeNavItems(fallbackNavItems));
   const [values, setValues] = useState(fallbackValues);
   const [newsEvents, setNewsEvents] = useState(fallbackNewsEvents);
@@ -171,7 +173,6 @@ export default function App() {
     "footer"
   ];
 
-  // Single scroll spy instance — passed down to Navbar to avoid duplicate observers
   const activeSection = useScrollSpy({ sectionIds });
 
   useEffect(() => {
@@ -196,7 +197,6 @@ export default function App() {
 
     animationFrameId = requestAnimationFrame(raf);
 
-    // Provide Lenis to anchor links for smooth scrolling to sections
     const handleAnchorClick = (e) => {
       const href = e.currentTarget.getAttribute("href");
       if (href?.startsWith("#")) {
@@ -256,6 +256,11 @@ export default function App() {
   const openLogin = useCallback(() => setIsLoginOpen(true), []);
   const closeLogin = useCallback(() => setIsLoginOpen(false), []);
 
+  const handleNavigate = useCallback((page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   return (
     <>
       <a
@@ -264,31 +269,45 @@ export default function App() {
       >
         Skip to main content
       </a>
-      <Navbar navItems={navItems} onSearchOpen={openSearch} onLoginOpen={openLogin} activeSection={activeSection} />
-      <main tabIndex="-1" className="min-h-dvh bg-sandstone-50 text-ink-900 focus:outline-none">
-        <MainHero />
-        {/* Unified About Us section spanning from MissionBlock through all SplitFeatures until Core Values */}
-        <div id="about" className="scroll-mt-20">
-          <MissionBlock />
-          {featuresData.map((feature) => (
-            <SplitFeature
-              key={feature.id}
-              category={feature.category}
-              heading={feature.heading}
-              body={feature.body}
-              linkText={feature.linkText}
-              linkHref={feature.linkHref}
-              image={feature.image}
-              alt={feature.alt}
-              isReversed={feature.isReversed}
-              bgColor={feature.bgColor}
-            />
-          ))}
-        </div>
-        <ValueWheel values={values} />
-        <NewsTimeline newsEvents={newsEvents} />
-        <InstagramFeed />
-      </main>
+
+      <Navbar
+        navItems={navItems}
+        onSearchOpen={openSearch}
+        onLoginOpen={openLogin}
+        activeSection={activeSection}
+        currentPage={currentPage}
+        onNavigate={handleNavigate}
+      />
+
+      {currentPage === "faq" ? (
+        <FaqPage onNavigateHome={() => handleNavigate("home")} />
+      ) : (
+        <main tabIndex="-1" className="min-h-dvh bg-sandstone-50 text-ink-900 focus:outline-none">
+          <MainHero />
+          {/* Unified About Us section spanning from MissionBlock through all SplitFeatures until Core Values */}
+          <div id="about" className="scroll-mt-20">
+            <MissionBlock />
+            {featuresData.map((feature) => (
+              <SplitFeature
+                key={feature.id}
+                category={feature.category}
+                heading={feature.heading}
+                body={feature.body}
+                linkText={feature.linkText}
+                linkHref={feature.linkHref}
+                image={feature.image}
+                alt={feature.alt}
+                isReversed={feature.isReversed}
+                bgColor={feature.bgColor}
+              />
+            ))}
+          </div>
+          <ValueWheel values={values} />
+          <NewsTimeline newsEvents={newsEvents} />
+          <InstagramFeed />
+        </main>
+      )}
+
       <Footer onLoginOpen={openLogin} />
       <SearchOverlay isOpen={isSearchOpen} onClose={closeSearch} navItems={navItems} />
       <LoginModal isOpen={isLoginOpen} onClose={closeLogin} />
