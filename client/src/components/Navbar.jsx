@@ -17,11 +17,9 @@ import useFocusTrap from "../hooks/useFocusTrap.js";
 import useScrollSpy from "../hooks/useScrollSpy.js";
 
 /* ─── Theme tokens (match tailwind.config.js) ─────────────────────────── */
-const BASE_COLOR     = "#3f0d0f"; // maroon-900
-const PILL_COLOR     = "#fffaf2"; // sandstone-50
-const HOVER_TEXT     = "#fffaf2"; // text shown after circle fills
-const DEFAULT_TEXT   = "#211b18"; // ink-900
-const EASE           = "power3.out";
+const BASE_COLOR = "#3f0d0f";
+const HOVER_TEXT = "#ffffff";
+const EASE = "power3.out";
 
 /* ─── Helpers ──────────────────────────────────────────────────────────── */
 function flattenNav(navItems) {
@@ -36,9 +34,9 @@ function flattenNav(navItems) {
  *   delta = how far the circle centre sits below the pill bottom
  */
 function computeCircleGeometry(w, h) {
-  const R      = ((w * w) / 4 + h * h) / (2 * h);
-  const D      = Math.ceil(2 * R) + 2;
-  const delta  = Math.ceil(R - Math.sqrt(Math.max(0, R * R - (w * w) / 4))) + 1;
+  const R = ((w * w) / 4 + h * h) / (2 * h);
+  const D = Math.ceil(2 * R) + 2;
+  const delta = Math.ceil(R - Math.sqrt(Math.max(0, R * R - (w * w) / 4))) + 1;
   const originY = D - delta;
   return { D, delta, originY };
 }
@@ -48,18 +46,27 @@ function computeCircleGeometry(w, h) {
  * Manages its own GSAP timeline via useEffect, rebuilding when isActive changes.
  */
 function NavPill({ item, isActive }) {
-  const pillRef      = useRef(null);
-  const circleRef    = useRef(null);
-  const labelRef     = useRef(null);
+  const pillRef = useRef(null);
+  const circleRef = useRef(null);
+  const labelRef = useRef(null);
   const hoverLabelRef = useRef(null);
-  const tlRef        = useRef(null);
+  const tlRef = useRef(null);
   const activeTweenRef = useRef(null);
 
   // Build / rebuild hover timeline when active state or item changes
   useEffect(() => {
     const circle = circleRef.current;
-    const pill   = pillRef.current;
-    if (!circle || !pill) return;
+    const pill = pillRef.current;
+    const label = labelRef.current;
+    const hoverLabel = hoverLabelRef.current;
+    if (!circle || !pill) return undefined;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.set(circle, { display: "none" });
+      if (label) gsap.set(label, { clearProps: "transform" });
+      if (hoverLabel) gsap.set(hoverLabel, { display: "none" });
+      return undefined;
+    }
 
     const rect = pill.getBoundingClientRect();
     const { w, h } = { w: rect.width, h: rect.height };
@@ -67,7 +74,7 @@ function NavPill({ item, isActive }) {
 
     const { D, delta, originY } = computeCircleGeometry(w, h);
 
-    circle.style.width  = `${D}px`;
+    circle.style.width = `${D}px`;
     circle.style.height = `${D}px`;
     circle.style.bottom = `-${delta}px`;
 
@@ -78,8 +85,6 @@ function NavPill({ item, isActive }) {
       display: isActive ? "none" : "block",
     });
 
-    const label = labelRef.current;
-    const hoverLabel = hoverLabelRef.current;
     if (label) gsap.set(label, { y: 0 });
     if (hoverLabel) gsap.set(hoverLabel, { y: h + 12, opacity: 0 });
 
@@ -89,7 +94,7 @@ function NavPill({ item, isActive }) {
     tl.to(circle, {
       scale: 1.2,
       xPercent: -50,
-      duration: 0.8,
+      duration: 0.45,
       ease: EASE,
       overwrite: "auto",
     }, 0);
@@ -97,7 +102,7 @@ function NavPill({ item, isActive }) {
     if (label) {
       tl.to(label, {
         y: -(h + 8),
-        duration: 0.6,
+        duration: 0.4,
         ease: EASE,
         overwrite: "auto",
       }, 0);
@@ -108,7 +113,7 @@ function NavPill({ item, isActive }) {
       tl.to(hoverLabel, {
         y: 0,
         opacity: 1,
-        duration: 0.6,
+        duration: 0.4,
         ease: EASE,
         overwrite: "auto",
       }, 0);
@@ -127,7 +132,7 @@ function NavPill({ item, isActive }) {
     if (!tl) return;
     activeTweenRef.current?.kill();
     activeTweenRef.current = tl.tweenTo(tl.duration(), {
-      duration: 0.4,
+      duration: 0.24,
       ease: EASE,
       overwrite: "auto",
     });
@@ -139,7 +144,7 @@ function NavPill({ item, isActive }) {
     if (!tl) return;
     activeTweenRef.current?.kill();
     activeTweenRef.current = tl.tweenTo(0, {
-      duration: 0.3,
+      duration: 0.2,
       ease: EASE,
       overwrite: "auto",
     });
@@ -157,8 +162,10 @@ function NavPill({ item, isActive }) {
         onMouseLeave={handleLeave}
         onFocus={handleEnter}
         onBlur={handleLeave}
-        className={`relative overflow-hidden inline-flex items-center justify-center h-9 self-center no-underline rounded-full px-6 font-semibold text-sm uppercase tracking-wider cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sandstone-50 focus-visible:ring-offset-1 focus-visible:ring-offset-maroon-900 transition-colors duration-300 ease-out ${
-          isActive ? "bg-maroon-700 text-sandstone-50" : "bg-sandstone-50 text-ink-900 hover:bg-sandstone-100"
+        className={`pill-nav-link relative inline-flex h-10 self-center items-center justify-center overflow-hidden rounded-full px-5 text-sm font-semibold uppercase tracking-wider no-underline select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-maroon-900 ${
+          isActive
+            ? "bg-white text-maroon-900 hover:bg-white hover:text-maroon-900"
+            : "bg-white text-ink-900 hover:bg-white hover:text-ink-900"
         }`}
       >
         {/* Rising background circle - always rendered, hidden via GSAP when active */}
@@ -196,9 +203,9 @@ function NavPill({ item, isActive }) {
 export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activeSection: activeSectionProp }) {
   /* — mobile drawer state & a11y — */
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const closeDrawer  = useCallback(() => setIsDrawerOpen(false), []);
-  const drawerRef    = useFocusTrap(isDrawerOpen, closeDrawer);
-  const allLinks     = flattenNav(navItems);
+  const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
+  const drawerRef = useFocusTrap(isDrawerOpen, closeDrawer);
+  const allLinks = flattenNav(navItems);
 
   /* — scroll spy for active section — */
   const sectionIds = navItems.map((item) => item.href?.replace("#", "")).filter(Boolean);
@@ -237,7 +244,7 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
   }, [navItems.length]); // Only re-run if number of nav items changes
 
   return (
-    <header className="sticky top-0 z-40 border-b border-sandstone-200 bg-sandstone-50/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-white/30 bg-white/40 backdrop-blur-lg shadow-sm">
       <nav
         aria-label="Primary navigation"
         className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
@@ -273,14 +280,14 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
         ──────────────────────────────────────────────────────────── */}
         <div
           ref={navBarRef}
-          className="hidden lg:flex items-center rounded-full px-3 py-1 gap-3"
+          className="hidden items-center gap-2 rounded-full p-1.5 lg:flex"
           style={{ background: BASE_COLOR, minHeight: "48px" }}
           role="menubar"
           aria-label="Site sections"
         >
           <ul
             role="none"
-            className="list-none flex items-stretch m-0 p-0 h-full gap-3"
+            className="m-0 flex h-full list-none items-stretch gap-2 p-0"
           >
             {navItems.map((item) => {
               // Extract section ID from href (e.g., "#main-content" -> "main-content")
@@ -382,11 +389,10 @@ export default function Navbar({ navItems = [], onSearchOpen, onLoginOpen, activ
                   key={item.id}
                   href={item.href}
                   onClick={closeDrawer}
-                  className={`rounded-heritage border px-4 py-3 font-semibold no-underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 ${
-                    activeSection === item.id
+                  className={`rounded-heritage border px-4 py-3 font-semibold no-underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 ${activeSection === item.id
                       ? "border-maroon-300 bg-maroon-50 text-maroon-900"
                       : "border-sandstone-200 bg-white text-ink-900 hover:border-maroon-100 hover:bg-maroon-50 hover:text-maroon-700"
-                  }`}
+                    }`}
                   aria-current={activeSection === item.id ? "page" : undefined}
                 >
                   {item.label}

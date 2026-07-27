@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import Lenis from "lenis";
 import LoginModal from "./components/LoginModal.jsx";
 import Navbar from "./components/Navbar.jsx";
 import SearchOverlay from "./components/SearchOverlay.jsx";
@@ -35,7 +36,7 @@ const fallbackHeroSlides = [
     caption: "Students from every house gather on the open grounds — competing, celebrating, and carrying the school's spirit of excellence in deed.",
     date: "2026-01-28",
     category: "Sports",
-    image: "/images/hero/sports-champions.png",
+    image: "/images/hero/mainhero.png",
     alt: "Vasant Valley School students assembled on the sports ground at golden hour",
     fullBleed: true
   },
@@ -205,7 +206,52 @@ export default function App() {
     "footer"
   ];
 
+  // Single scroll spy instance — passed down to Navbar to avoid duplicate observers
   const activeSection = useScrollSpy({ sectionIds });
+
+  useEffect(() => {
+    // Respect prefers-reduced-motion
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mediaQuery.matches) return;
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+    });
+
+    let animationFrameId;
+
+    function raf(time) {
+      lenis.raf(time);
+      animationFrameId = requestAnimationFrame(raf);
+    }
+
+    animationFrameId = requestAnimationFrame(raf);
+
+    // Provide Lenis to anchor links for smooth scrolling to sections
+    const handleAnchorClick = (e) => {
+      const href = e.currentTarget.getAttribute('href');
+      if (href?.startsWith('#')) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          lenis.scrollTo(target);
+        }
+      }
+    };
+
+    const anchorLinks = document.querySelectorAll('a[href^="#"]');
+    anchorLinks.forEach(link => link.addEventListener('click', handleAnchorClick));
+
+    return () => {
+      lenis.destroy();
+      cancelAnimationFrame(animationFrameId);
+      anchorLinks.forEach(link => link.removeEventListener('click', handleAnchorClick));
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -214,7 +260,9 @@ export default function App() {
       try {
         setIsLoading(true);
         setError(null);
-        const response = await fetch("http://127.0.0.1:5000/api/home");
+        // Use a relative URL so this works on both localhost and Vercel (via vite proxy / same origin)
+        const apiBase = import.meta.env.VITE_API_URL ?? "";
+        const response = await fetch(`${apiBase}/api/home`);
         if (!response.ok) {
           throw new Error("Unable to load homepage content");
         }
@@ -227,13 +275,12 @@ export default function App() {
           setNewsEvents(data.newsEvents || fallbackNewsEvents);
           setIsLoading(false);
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
           setNavItems(sanitizeNavItems(fallbackNavItems));
           setHeroSlides(fallbackHeroSlides);
           setValues(fallbackValues);
           setNewsEvents(fallbackNewsEvents);
-          setError(err.message || "Failed to fetch homepage content");
           setIsLoading(false);
         }
       }

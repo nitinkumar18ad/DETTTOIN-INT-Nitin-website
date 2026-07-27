@@ -291,7 +291,7 @@ export default function ValueWheel({ values = [] }) {
   }, []);
 
   return (
-    <SectionShell id="values" className="bg-sandstone-50 border-t border-b border-sandstone-200">
+    <SectionShell id="values" className="bg-sandstone-50 border-t border-b border-sandstone-200" animate={false}>
       <div ref={sectionRef} className="mb-12 max-w-3xl text-center mx-auto">
         <motion.p
           initial={{ opacity: 0, y: 16 }}

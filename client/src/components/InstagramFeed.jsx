@@ -57,7 +57,7 @@ export default function InstagramFeed() {
   };
 
   return (
-    <SectionShell id="instagram-feed" className="bg-sandstone-50 border-t border-sandstone-200">
+    <SectionShell id="instagram-feed" className="bg-sandstone-50 border-t border-sandstone-200" animate={false}>
       <div className="text-center max-w-2xl mx-auto mb-12">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-maroon-700">
           Social Feed

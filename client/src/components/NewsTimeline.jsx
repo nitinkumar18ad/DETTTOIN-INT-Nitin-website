@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import SectionShell from "./SectionShell.jsx";
 import { formatDisplayDate } from "../utils/date.js";
-import { Funnel, ArrowClockwise, CalendarBlank, Newspaper } from "@phosphor-icons/react";
+import { Funnel, ArrowClockwise, CalendarBlank } from "@phosphor-icons/react";
 
 const newsImagePool = [
   "/images/hero/campus-morning.svg",
@@ -13,17 +14,116 @@ const newsImagePool = [
   "/images/features/learning.svg",
 ];
 
+const TimelineCard = ({ item, index, newsImagesById, isEven, IsNews }) => {
+  const cardRef = useRef(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start 120px", "end start"]
+  });
+
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [1, 0.5, 0]);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      style={{
+        position: 'sticky',
+        top: `calc(120px + ${index * 16}px)`,
+        scale,
+        opacity,
+        zIndex: index,
+      }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: 0.1 }}
+      className="relative flex flex-col lg:flex-row items-stretch lg:justify-between py-6 bg-white/95 backdrop-blur-sm shadow-[0_-2px_15px_rgba(0,0,0,0.04)] border-t border-sandstone-100 rounded-t-2xl lg:rounded-t-none lg:border-none lg:shadow-none lg:bg-transparent"
+    >
+      {/* Timeline Card Column */}
+      <div
+        className={`w-full lg:w-[calc(50%-2rem)] ${
+          isEven ? "lg:order-1" : "lg:order-3"
+        }`}
+      >
+        <div className="pl-12 lg:pl-0">
+          <article className="bg-white rounded-heritage border border-sandstone-200 p-6 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-4 group">
+            {/* Image Preview */}
+            <div className="relative h-40 overflow-hidden rounded bg-sandstone-100">
+              <img
+                src={newsImagesById[item.id]}
+                alt={item.alt || item.title}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
+              <div className="absolute bottom-3 left-3 rounded-full bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-maroon-900 shadow-sm">
+                {IsNews ? "News" : "Event"}
+              </div>
+            </div>
+
+            {/* Header info */}
+            <div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-xs font-semibold uppercase tracking-wider text-maroon-700 bg-maroon-50 px-2.5 py-1 rounded">
+                  {item.category}
+                </span>
+                <span className="text-xs text-ink-500">
+                  {formatDisplayDate(item.date)}
+                </span>
+              </div>
+              <h3 className="mt-3 text-lg font-serif font-bold text-maroon-900 leading-tight">
+                {item.title}
+              </h3>
+            </div>
+
+            {/* Summary */}
+            <p className="text-sm text-ink-700 leading-relaxed font-sans">
+              {item.summary}
+            </p>
+
+            {/* Link */}
+            <a
+              href={item.href}
+              className="inline-flex items-center text-xs font-semibold text-maroon-700 hover:text-maroon-950 self-start mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 rounded"
+            >
+              Read article &rarr;
+            </a>
+          </article>
+        </div>
+      </div>
+
+      {/* Central Date Node */}
+      <div
+        className="absolute left-4 lg:left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center justify-center w-12 h-12 rounded-full border-2 border-sandstone-200 bg-white shadow-soft lg:order-2 mt-4 lg:mt-0 lg:top-1/2 lg:-translate-y-1/2"
+        aria-hidden="true"
+      >
+        <span className="text-[10px] font-bold text-maroon-700 uppercase leading-none">
+          {item.month.substring(0, 3)}
+        </span>
+        <span className="text-[10px] font-semibold text-ink-500 leading-none mt-1">
+          {item.year}
+        </span>
+      </div>
+
+      {/* Empty Side (Desktop Spacer) */}
+      <div className={`hidden lg:block lg:w-[calc(50%-2rem)] ${
+          isEven ? "lg:order-3" : "lg:order-1"
+        }`} />
+    </motion.div>
+  );
+};
+
 export default function NewsTimeline({ newsEvents = [] }) {
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
 
-  // Helper to sort months chronologically
   const monthOrder = {
     January: 0, February: 1, March: 2, April: 3, May: 4, June: 5,
     July: 6, August: 7, September: 8, October: 9, November: 10, December: 11
   };
 
-  // Derive unique filter options from actual data
   const uniqueYears = Array.from(new Set(newsEvents.map((item) => item.year)))
     .sort((a, b) => b - a);
   const uniqueMonths = Array.from(new Set(newsEvents.map((item) => item.month)))
@@ -37,14 +137,12 @@ export default function NewsTimeline({ newsEvents = [] }) {
     }, {});
   }, [newsEvents]);
 
-  // Filter events
   const filteredEvents = newsEvents.filter((item) => {
     const matchesMonth = selectedMonth ? item.month === selectedMonth : true;
     const matchesYear = selectedYear ? item.year.toString() === selectedYear : true;
     return matchesMonth && matchesYear;
   });
 
-  // Sort chronological order (newest first)
   const sortedEvents = [...filteredEvents].sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
@@ -55,13 +153,13 @@ export default function NewsTimeline({ newsEvents = [] }) {
   };
 
   return (
-    <SectionShell id="news-events" className="bg-white">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-sandstone-200 pb-8">
+    <SectionShell id="news-events" className="bg-white relative" animate={false}>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-sandstone-200 pb-8 relative z-[100] bg-white">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-maroon-700">
             Chronicles
           </p>
-          <h2 className="mt-4">News &amp; Events</h2>
+          <h2 className="mt-4 text-3xl font-serif text-maroon-900">News &amp; Events</h2>
           <p className="mt-4 text-ink-700">
             Keep track of active student programs, academic milestones, and campus activities.
           </p>
@@ -74,7 +172,6 @@ export default function NewsTimeline({ newsEvents = [] }) {
             <span className="text-sm font-semibold uppercase tracking-wider">Filter</span>
           </div>
 
-          {/* Year Filter */}
           <div className="flex flex-col">
             <label htmlFor="year-select" className="sr-only">Year</label>
             <select
@@ -85,14 +182,11 @@ export default function NewsTimeline({ newsEvents = [] }) {
             >
               <option value="">All Years</option>
               {uniqueYears.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
+                <option key={year} value={year}>{year}</option>
               ))}
             </select>
           </div>
 
-          {/* Month Filter */}
           <div className="flex flex-col">
             <label htmlFor="month-select" className="sr-only">Month</label>
             <select
@@ -103,14 +197,11 @@ export default function NewsTimeline({ newsEvents = [] }) {
             >
               <option value="">All Months</option>
               {uniqueMonths.map((month) => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
+                <option key={month} value={month}>{month}</option>
               ))}
             </select>
           </div>
 
-          {/* Reset Button */}
           {(selectedMonth || selectedYear) && (
             <button
               type="button"
@@ -124,7 +215,6 @@ export default function NewsTimeline({ newsEvents = [] }) {
         </div>
       </div>
 
-      {/* Empty State */}
       {sortedEvents.length === 0 ? (
         <div className="text-center py-16 bg-sandstone-50 rounded-heritage border border-sandstone-200 border-dashed">
           <CalendarBlank size={48} className="mx-auto text-ink-500" />
@@ -141,86 +231,20 @@ export default function NewsTimeline({ newsEvents = [] }) {
           </button>
         </div>
       ) : (
-        /* Timeline Grid Container */
-        <div className="relative space-y-12 before:absolute before:left-4 lg:before:left-1/2 before:top-4 before:bottom-4 before:w-0.5 before:bg-sandstone-200">
+        <div className="relative pb-[20vh] before:absolute before:left-4 lg:before:left-1/2 before:top-4 before:bottom-0 before:w-0.5 before:bg-sandstone-200/50">
           {sortedEvents.map((item, index) => {
             const isEven = index % 2 === 0;
             const IsNews = item.type === "news";
 
             return (
-              <div
+              <TimelineCard 
                 key={item.id}
-                className="relative flex flex-col lg:flex-row items-stretch lg:justify-between"
-              >
-                {/* Timeline Card Column */}
-                <div
-                  className={`w-full lg:w-[calc(50%-2rem)] ${
-                    isEven ? "lg:order-1" : "lg:order-3"
-                  }`}
-                >
-                  <div className="pl-12 lg:pl-0">
-                    <article className="bg-white rounded-heritage border border-sandstone-200 p-6 shadow-soft hover:border-maroon-300 transition-all duration-300 flex flex-col gap-4">
-                      {/* Image Preview */}
-                      <div className="relative h-40 overflow-hidden rounded bg-sandstone-100">
-                        <img
-                          src={newsImagesById[item.id]}
-                          alt={item.alt || item.title}
-                          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-                          loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
-                        <div className="absolute bottom-3 left-3 rounded-full bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-maroon-900 shadow-sm">
-                          {IsNews ? "News" : "Event"}
-                        </div>
-                      </div>
-
-                      {/* Header info */}
-                      <div>
-                        <div className="flex items-center justify-between gap-4">
-                          <span className="text-xs font-semibold uppercase tracking-wider text-maroon-700 bg-maroon-50 px-2.5 py-1 rounded">
-                            {item.category}
-                          </span>
-                          <span className="text-xs text-ink-500">
-                            {formatDisplayDate(item.date)}
-                          </span>
-                        </div>
-                        <h3 className="mt-3 text-lg font-serif font-bold text-maroon-900 leading-tight">
-                          {item.title}
-                        </h3>
-                      </div>
-
-                      {/* Summary */}
-                      <p className="text-sm text-ink-700 leading-relaxed font-sans">
-                        {item.summary}
-                      </p>
-
-                      {/* Link */}
-                      <a
-                        href={item.href}
-                        className="inline-flex items-center text-xs font-semibold text-maroon-700 hover:text-maroon-950 self-start mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-500 rounded"
-                      >
-                        Read article &rarr;
-                      </a>
-                    </article>
-                  </div>
-                </div>
-
-                {/* Central Date Node */}
-                <div
-                  className="absolute left-4 lg:left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center justify-center w-12 h-12 rounded-full border-2 border-sandstone-200 bg-white shadow-soft"
-                  aria-hidden="true"
-                >
-                  <span className="text-[10px] font-bold text-maroon-700 uppercase leading-none">
-                    {item.month.substring(0, 3)}
-                  </span>
-                  <span className="text-[10px] font-semibold text-ink-500 leading-none mt-1">
-                    {item.year}
-                  </span>
-                </div>
-
-                {/* Empty Side (Desktop Spacer) */}
-                <div className="hidden lg:block lg:w-[calc(50%-2rem)] lg:order-2" />
-              </div>
+                item={item}
+                index={index}
+                newsImagesById={newsImagesById}
+                isEven={isEven}
+                IsNews={IsNews}
+              />
             );
           })}
         </div>
