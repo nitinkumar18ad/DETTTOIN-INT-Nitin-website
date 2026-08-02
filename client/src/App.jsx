@@ -149,12 +149,12 @@ const featuresData = [
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState("home"); // "home" | "faq" | "announcement" | "vision"
-  const [navItems, setNavItems] = useState(() => sanitizeNavItems(fallbackNavItems));
-  const [values, setValues] = useState(fallbackValues);
-  const [newsEvents, setNewsEvents] = useState(fallbackNewsEvents);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const lenisRef = useRef(null);
+  const navItems = sanitizeNavItems(fallbackNavItems);
+  const values = fallbackValues;
+  const newsEvents = fallbackNewsEvents;
 
   // WhatsApp-style 1.0s initial loading splash while page pre-loads in background
   useEffect(() => {
@@ -218,39 +218,6 @@ export default function App() {
       lenisRef.current = null;
       cancelAnimationFrame(animationFrameId);
       anchorLinks.forEach((link) => link.removeEventListener("click", handleAnchorClick));
-    };
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadHomeContent() {
-      try {
-        const apiBase = import.meta.env.VITE_API_URL ?? "";
-        const response = await fetch(`${apiBase}/api/home`);
-        if (!response.ok) {
-          throw new Error("Unable to load homepage content");
-        }
-
-        const data = await response.json();
-        if (isMounted) {
-          setNavItems(sanitizeNavItems(data.navItems));
-          setValues(data.values || fallbackValues);
-          setNewsEvents(data.newsEvents || fallbackNewsEvents);
-        }
-      } catch {
-        if (isMounted) {
-          setNavItems(sanitizeNavItems(fallbackNavItems));
-          setValues(fallbackValues);
-          setNewsEvents(fallbackNewsEvents);
-        }
-      }
-    }
-
-    loadHomeContent();
-
-    return () => {
-      isMounted = false;
     };
   }, []);
 

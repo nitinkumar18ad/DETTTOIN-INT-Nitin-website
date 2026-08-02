@@ -1,5 +1,5 @@
 # Vasant Valley School — Modern Web Application
-A modern, high-performance, and visually engaging web application for **Vasant Valley School**, built with React 18, Vite, Tailwind CSS, Framer Motion, GSAP, and Node.js / Express.
+A modern, high-performance, and visually engaging static web application for **Vasant Valley School**, built with React 18, Vite, Tailwind CSS, Framer Motion, and GSAP.
 
 
 ## Project & Candidate Information
@@ -15,8 +15,7 @@ A modern, high-performance, and visually engaging web application for **Vasant V
 
 ## Technologies Used
 - **Frontend**: React 18, Vite, Tailwind CSS, Framer Motion, GSAP (GreenSock), Phosphor Icons, Lenis Smooth Scroll
-- **Backend API**: Node.js, Express.js (REST API Endpoints)
-- **Deployment**: Vercel Ready (`vercel.json`)
+- **Deployment**: Vercel static build (`vercel.json`)
 
 ---
 
@@ -62,26 +61,17 @@ A modern, high-performance, and visually engaging web application for **Vasant V
    cd DETTROIN-INT-Nitin-website
    ```
 
-2. **Install Client & Server Dependencies**:
+2. **Install Client Dependencies**:
    ```bash
-   # Install Client Dependencies
    cd client
-   npm install
-
-   # Install Server Dependencies
-   cd ../server
    npm install
    ```
 
-3. **Run Development Servers**:
+3. **Run Development Server**:
    ```bash
    # Start Client Dev Server (Localhost:5173)
    cd client
    npm run dev
-
-   # Start Express Backend API (Localhost:5000)
-   cd ../server
-   npm start
    ```
 
 ---
